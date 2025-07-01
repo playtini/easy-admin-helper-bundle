@@ -12,7 +12,7 @@ trait ArchivableEntityTrait
 {
     use CreatableEntityTrait;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?DateTimeInterface $archivedAt = null;
 
     public function isArchived(): bool
