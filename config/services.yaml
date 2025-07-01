@@ -1,0 +1,14 @@
+services:
+    Playtini\EasyAdminHelperBundle\Dashboard\DashboardHelper:
+        autowire: true
+        public: true
+    Playtini\EasyAdminHelperBundle\Dashboard\EasyAdminContext:
+        autowire: true
+        public: true
+
+    Playtini\EasyAdminHelperBundle\Controller\:
+        autowire: true
+        autoconfigure: true
+        public: true
+        resource: '../src/Controller/'
+        tags: [ 'controller.service_arguments' ]

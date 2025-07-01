@@ -1,0 +1,37 @@
+{% set menu = top_menu() %}
+
+{% set active_menu_item = active_menu_item|default(app.request.get('_route')) %}
+{% set active_menu_item_2 = active_menu_item_2|default(app.request.get('_route')) %}
+
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    {% for key, value in menu %}
+        {% if value is not iterable %}
+            <li {% if menu_titles[key] is defined %}title="{{ menu_titles[key] }}" {% endif %}
+            ><a class="nav-link {{ (active_menu_item == key) ? 'active' : '' }}" href="{{ path(key) }}">{{ value }}</a></li>
+        {% else %}
+            <li class="nav-item dropdown {% if active_menu_item == key %}active{% endif %}">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ value.name }}</a>
+                <ul class="dropdown-menu">
+                    {% for key2, value2 in value.items %}
+                        <li><a class="dropdown-item {% if active_menu_item == key2 or active_menu_item_2 == key2 %}active{% endif %}" href="{{ path(key2) }}">{{ value2 }}</a></li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endif %}
+    {% endfor %}
+</ul>
+{#<form class="d-flex">
+    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+    <button class="btn btn-outline-success" type="submit">Search</button>
+</form>#}
+{% if app.user is not empty %}
+    <div class="dropdown text-end">
+        <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="true">
+            <img src="{{ app.user.email|gravatar_image_url(32) }}" alt="" title="{{ app.user.userIdentifier }} - {{ app.user.name }}" width="32" height="32" class="rounded-circle">
+        </a>
+        <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1" style="position: absolute; inset: 0 0 auto auto; margin: 0; transform: translate(0px, 34px);" data-popper-placement="bottom-end">
+            <li class="nav-item text-muted small"><span class="dropdown-item">{{ 'now'|date_full }}</span></li>
+            <li><a class="dropdown-item" href="{{ path('peekaboo_logout') }}">Log out</a></li>
+        </ul>
+    </div>
+{% endif %}

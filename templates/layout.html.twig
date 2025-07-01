@@ -1,0 +1,37 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+{% set hour_hash = 'now'|date('Y-m-d_H') %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+
+    <link href="/css/app.css?{{ hour_hash }}" rel="stylesheet">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            ['.ea-new-form', '.ea-edit-form'].forEach((formSelector) => {
+                const form = document.querySelector(formSelector);
+                if (null === form) {
+                    return;
+                }
+
+                form.classList.add('row');
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block head_javascript %}
+    {{ parent() }}
+
+    <script src="/js/vendor/jquery.js"></script>
+    {# <script src="/js/vendor/bootstrap.bundle.min.js"></script> #}
+    <script src="/js/app.js?{{ hour_hash }}"></script>
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}
+
+{% block responsive_header_logo %}
+    <a class="responsive-logo" title="{{ ea.dashboardTitle|striptags }}" href="{{ path('easyadmin') }}">
+        {{ ea.dashboardTitle|raw }}
+    </a>
+{% endblock responsive_header_logo %}

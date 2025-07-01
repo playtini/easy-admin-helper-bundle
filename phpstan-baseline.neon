@@ -1,0 +1,25 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Trait Playtini\\EasyAdminHelperBundle\\Controller\\Traits\\CrudControllerTrait is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Controller/Traits/CrudControllerTrait.php
+
+		-
+			message: '#^Trait Playtini\\EasyAdminHelperBundle\\Controller\\Traits\\ReadOnlyCrudControllerTrait is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Controller/Traits/ReadOnlyCrudControllerTrait.php
+
+		-
+			message: '#^Trait Playtini\\EasyAdminHelperBundle\\Controller\\Traits\\UserCrudControllerTrait is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Controller/Traits/UserCrudControllerTrait.php
+
+		-
+			message: '#^Constant Playtini\\EasyAdminHelperBundle\\Field\\YamlField\:\:ALLOWED_LANGUAGES is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: src/Field/YamlField.php

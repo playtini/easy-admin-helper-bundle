@@ -1,0 +1,16 @@
+{% extends '@EasyAdminHelper/layout.html.twig' %}
+
+{% block content_title %}Doc{% endblock %}
+{% block page_actions %}
+    {#<a class="btn btn-primary" href="/admin">OK</a>#}
+{% endblock %}
+
+{% block main %}
+    <ul>
+        <li><a href="{{ url('admin_doc_db') }}">DB</a></li>
+
+        {% for item in items %}
+            <li><a href="{{ item.url }}">{{ item.title }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,97 @@
+name: Build
+on:
+    workflow_dispatch:
+    push: { branches: [ 'main' ] }
+
+concurrency:
+    group: ci-${{ github.ref }}-${{ github.head_ref }}
+    cancel-in-progress: true
+
+jobs:
+    test:
+        runs-on: self-hosted
+        steps:
+            -   name: checkout
+                uses: actions/checkout@v4
+                with: { fetch-depth: 1 }
+
+            -   name: composer cache
+                uses: actions/cache@v4
+                with:
+                    path: /tmp/composer-cache
+                    key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+            -   name: composer
+                uses: php-actions/composer@v6
+                with:
+                    dev: yes
+                    php_version: '8.4'
+                    memory_limit: '512M'
+                    args: '--ignore-platform-reqs --no-ansi --no-scripts --no-progress -o'
+
+            -   name: phpstan
+                uses: php-actions/phpstan@v3
+                with:
+                    path: 'src/'
+                    php_version: '8.4'
+                    php_extensions: mbstring redis pdo_mysql bcmath
+                    memory_limit: '512M'
+
+            -   name: phpunit
+                uses: php-actions/phpunit@v4
+                with:
+                    version: '11.5'
+                    php_version: '8.4'
+                    configuration: phpunit.xml.dist
+                    coverage_text: true
+                    memory_limit: '512M'
+                    php_extensions: xdebug mbstring redis pdo_mysql bcmath
+                env:
+                    XDEBUG_MODE: coverage
+
+            -   name: composer
+                uses: php-actions/composer@v6
+                with:
+                    dev: no
+                    php_version: '8.4'
+                    memory_limit: '512M'
+                    args: '--ignore-platform-reqs --no-ansi --no-scripts --no-progress -o'
+
+            -   uses: actions/upload-artifact@v4
+                if: ${{ failure() }}
+                with: { name: 'logs', path: 'var/log' }
+
+            -   name: Slack Message
+                uses: archive/github-actions-slack@v2.9.0
+                if: ${{ failure() }}
+                with:
+                    slack-function: send-message
+                    slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
+                    slack-channel: ${{ vars.SLACK_CHANNEL }}
+                    slack-text: ':large_red_square: ERROR ${{ github.repository }} because of ${{ github.event_name }}'
+
+    build:
+        runs-on: self-hosted
+        needs: test
+        steps:
+            -   name: Satis build
+                uses: appleboy/ssh-action@v1.0.3
+                with:
+                    host: vtools.s.p777.org
+                    username: root
+                    key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+                    port: 22
+                    script: "/usr/bin/docker exec satis bash -c '/var/www/html/bin/satis build -n'"
+
+#    notify:
+#        runs-on: self-hosted
+#        needs: build
+#        steps:
+#            -   name: Slack Message
+#                uses: archive/github-actions-slack@v2.9.0
+#                id: notify
+#                with:
+#                    slack-function: send-message
+#                    slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
+#                    slack-channel: ${{ vars.SLACK_CHANNEL }}
+#                    slack-text: ':large_green_circle: Updated library ${{ github.repository }}'

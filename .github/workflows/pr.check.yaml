@@ -1,0 +1,63 @@
+name: PR Check
+on:
+    workflow_dispatch:
+    pull_request:
+        branches: [ '*' ]
+
+concurrency:
+    group: ci-${{ github.ref }}-${{ github.head_ref }}
+    cancel-in-progress: true
+
+jobs:
+    test:
+        runs-on: self-hosted
+        steps:
+            -   name: checkout
+                uses: actions/checkout@v4
+                with: { fetch-depth: 1 }
+
+            -   name: composer cache
+                uses: actions/cache@v4
+                with:
+                    path: /tmp/composer-cache
+                    key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+            -   name: composer
+                uses: php-actions/composer@v6
+                with:
+                    dev: yes
+                    php_version: '8.4'
+                    memory_limit: '512M'
+                    args: '--ignore-platform-reqs --no-ansi --no-scripts --no-progress -o'
+
+            -   name: phpstan
+                uses: php-actions/phpstan@v3
+                with:
+                    path: 'src/'
+                    php_version: '8.4'
+                    php_extensions: mbstring redis pdo_mysql bcmath
+                    memory_limit: '512M'
+
+            -   name: phpunit
+                uses: php-actions/phpunit@v4
+                with:
+                    version: '11.5'
+                    php_version: '8.4'
+                    configuration: phpunit.xml.dist
+                    coverage_text: true
+                    memory_limit: '512M'
+                    php_extensions: xdebug mbstring redis pdo_mysql bcmath
+                env:
+                    XDEBUG_MODE: coverage
+
+            -   name: composer
+                uses: php-actions/composer@v6
+                with:
+                    dev: no
+                    php_version: '8.4'
+                    memory_limit: '512M'
+                    args: '--ignore-platform-reqs --no-ansi --no-scripts --no-progress -o'
+
+            -   uses: actions/upload-artifact@v4
+                if: ${{ failure() }}
+                with: { name: 'logs', path: 'var/log' }

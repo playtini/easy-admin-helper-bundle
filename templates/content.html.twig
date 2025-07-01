@@ -1,0 +1,7 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block responsive_header_logo %}
+    <a class="responsive-logo" title="{{ ea.dashboardTitle|striptags }}" href="{{ path('easyadmin') }}">
+        {{ ea.dashboardTitle|raw }}
+    </a>
+{% endblock responsive_header_logo %}
