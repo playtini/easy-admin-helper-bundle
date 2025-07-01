@@ -7,6 +7,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -84,7 +85,7 @@ readonly class DashboardExceptionSubscriber implements EventSubscriberInterface
         }
 
         if (!empty($title)) $title = '<b>' . $title . '</b><br/>';
-        if (!empty($title . $message)) {
+        if (!empty($title . $message) && $this->requestStack->getSession() instanceof FlashBagAwareSessionInterface) {
             $this->requestStack->getSession()->getFlashBag()->add($type, $title . $message);
         }
     }
@@ -92,7 +93,6 @@ readonly class DashboardExceptionSubscriber implements EventSubscriberInterface
     public function onKernelException(ExceptionEvent $event): void
     {
         // Check if exception happened in EasyAdmin (avoid warning outside EA)
-        if (!$this->adminContextProvider) return;
         if (!$this->adminContextProvider->getContext()) return;
 
         // Get back exception & send flash message
