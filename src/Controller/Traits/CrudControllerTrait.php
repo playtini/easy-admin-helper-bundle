@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace Playtini\EasyAdminHelperBundle\Controller\Traits;
 
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 
 trait CrudControllerTrait
 {
@@ -18,6 +24,49 @@ trait CrudControllerTrait
     public function configureActions(Actions $actions): Actions
     {
         return $this->_configureActions($actions);
+    }
+
+    protected function applyQueryBuilderJoin(QueryBuilder $queryBuilder, string $entity): QueryBuilder
+    {
+        $joined = false;
+        /** @var Join $join */
+        foreach ($queryBuilder->getDQLPart('join')['entity'] ?? [] as $join) {
+            if ($join->getJoin() === 'entity.' . $entity) {
+                $joined = true;
+            }
+        }
+        if (!$joined) {
+            $queryBuilder
+                ->leftJoin('entity.' . $entity, $entity);
+        }
+
+        return $queryBuilder;
+    }
+
+    protected function parentCreateIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
+    {
+        /** @noinspection PhpUndefinedMethodInspection */
+        return parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
+    }
+
+    protected function getAndUnsetFilter(SearchDto $searchDto, string $name): array
+    {
+        $value = $searchDto->getAppliedFilters()[$name] ?? null;
+        if (!$value) {
+            return [null, $searchDto];
+        }
+
+        $f = $searchDto->getAppliedFilters();
+        unset($f[$name]);
+
+        return [$value, new SearchDto(
+            request: $searchDto->getRequest(),
+            searchableProperties: $searchDto->getSearchableProperties(),
+            query: $searchDto->getQuery(),
+            defaultSort: [],
+            customSort: $searchDto->getSort(),
+            appliedFilters: $f,
+        )];
     }
 
     protected function _configureCrud(Crud $crud): Crud
