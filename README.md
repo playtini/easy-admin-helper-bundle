@@ -18,6 +18,11 @@ Add to `config/services.yaml`
     Playtini\EasyAdminHelperBundle\Dashboard\EasyAdminContext:
         bind:
             $dashboardController: '@App\Controller\Admin\DashboardController'
+    Playtini\EasyAdminHelperBundle\Event\DashboardExceptionSubscriber:
+        tags: [ { name: kernel.event_subscriber } ]
+```
+
+This ensures Symfony autowires and autoconfigures your subscriber.
 ```
 
 Load routes. Add to `config/routes/easyadmin.yaml`
