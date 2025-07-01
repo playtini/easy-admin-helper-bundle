@@ -417,7 +417,25 @@ class CrudField
             ->setColumns($cols)
             ->setRequired(false)
             ->setDisabled(self::$disabled)
-            ->setTemplatePath('easyadmin/fields/boolnull.html.twig');
+            ->setTemplatePath('easyadmin/fields/bool-null.html.twig');
+    }
+
+    public static function isLive(int $cols = 2): BooleanField
+    {
+        return BooleanField::new('isLive')
+            ->setLabel('Live')
+            ->setColumns($cols)
+            ->setRequired(false)
+            ->setDisabled(self::$disabled)
+            ->setTemplatePath('easyadmin/fields/emoji-bool-null.html.twig');
+    }
+
+    public static function isEnabledEditable(int $cols = 2): BooleanField
+    {
+        return BooleanField::new('isEnabled')
+            ->setLabel('Enabled')
+            ->setColumns($cols)
+            ->setRequired(false);
     }
 
     private static function humanizeString(string $string): string

@@ -21,6 +21,10 @@ trait ReadOnlyCrudControllerTrait
 
     public function configureFields(string $pageName): iterable
     {
+        if (!method_exists($this, 'doConfigureFields')) {
+            die(sprintf('error: implement %s->doConfigureFields', static::class));
+        }
+
         $items = $this->doConfigureFields($pageName);
         foreach ($items as $item) {
             if (method_exists($item, 'setDisabled')) {

@@ -1,0 +1,31 @@
+<?php
+
+namespace Playtini\EasyAdminHelperBundle\Entity\Traits;
+
+use Doctrine\ORM\Mapping as ORM;
+
+trait NameUniqueEntityTrait
+{
+    use NameEntityTrait;
+
+    /** @noinspection TraitsPropertiesConflictsInspection */
+    #[ORM\Column(length: 255, unique: true, options: ['default' => ''])]
+    private string $name = '';
+
+    public function getName(): string
+    {
+        return $this->name ?? '';
+    }
+
+    public function setName(?string $name): static
+    {
+        $this->name = mb_substr($name ?? '', 0, 255);
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getName();
+    }
+}

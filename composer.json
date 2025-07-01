@@ -18,8 +18,10 @@
         "php": "^8.4",
         "easycorp/easyadmin-bundle": "^4.24",
         "erusev/parsedown": "^1.7",
+        "gupalo/dateutils": "^1.20",
         "gupalo/monolog-dbal-logger": "^1.7",
         "gupalo/symfony-form-transformers": "^1.3",
+        "gupalo/uidgenerator": "^1.2",
         "peekabooauth/peekaboo-bundle": "^1.4",
         "spatie/yaml-front-matter": "^2.1",
         "symfony/framework-bundle": "^7.2"
