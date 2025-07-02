@@ -74,8 +74,13 @@ trait ArchiveCrudControllerTrait
     {
         $archiveAction = $this->createArchiveAction();
 
-        /** @noinspection PhpUndefinedClassInspection */
-        return parent::configureActions($actions)
+        return $actions
+            ->add(Crud::PAGE_NEW, Action::SAVE_AND_RETURN)
+            ->add(Crud::PAGE_NEW, Action::SAVE_AND_ADD_ANOTHER)
+            ->add(Crud::PAGE_EDIT, Action::SAVE_AND_RETURN)
+            ->add(Crud::PAGE_EDIT, Action::SAVE_AND_CONTINUE)
+            ->add(Crud::PAGE_INDEX, Action::EDIT)
+            ->add(Crud::PAGE_INDEX, Action::NEW)
             ->disable(Action::DELETE)
             ->add(Crud::PAGE_EDIT, $archiveAction);
     }
