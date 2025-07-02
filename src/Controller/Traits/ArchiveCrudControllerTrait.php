@@ -72,6 +72,11 @@ trait ArchiveCrudControllerTrait
 
     public function configureActions(Actions $actions): Actions
     {
+        return $this->configureArchiveActions($actions);
+    }
+
+    protected function configureArchiveActions(Actions $actions): Actions
+    {
         $archiveAction = $this->createArchiveAction();
 
         return $actions
