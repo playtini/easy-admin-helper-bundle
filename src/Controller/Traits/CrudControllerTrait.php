@@ -11,8 +11,11 @@ use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait CrudControllerTrait
 {
@@ -98,5 +101,27 @@ trait CrudControllerTrait
         return $this->_configureActions($actions)
             ->add(Crud::PAGE_EDIT, Action::INDEX)
             ->disable(Action::NEW, Action::SAVE_AND_CONTINUE, Action::SAVE_AND_ADD_ANOTHER, Action::SAVE_AND_RETURN, Action::DELETE);
+    }
+
+    /** @noinspection ReturnTypeCanBeDeclaredInspection */
+    public function detail(AdminContext $context)
+    {
+        if (!property_exists($this, 'adminUrlGenerator')) {
+            return parent::detail($context);
+        }
+
+        $entity = $context->getEntity();
+
+        if (!$entity->isAccessible()) {
+            throw new NotFoundHttpException(sprintf('Entity "%s" is not accessible', $entity->getFqcn()));
+        }
+
+        $url = $this->adminUrlGenerator
+            ->setController(self::class)
+            ->setAction('edit')
+            ->setEntityId($entity->getPrimaryKeyValue())
+            ->generateUrl();
+
+        return new RedirectResponse($url);
     }
 }
