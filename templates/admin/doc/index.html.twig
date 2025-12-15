@@ -6,11 +6,13 @@
 {% endblock %}
 
 {% block main %}
-    <ul>
-        <li><a href="{{ url('admin_doc_db') }}">DB</a></li>
+    <div class="doc doc-index">
+        <ul>
+            <li><a href="{{ url('admin_doc_db') }}">DB</a></li>
 
-        {% for item in items %}
-            <li><a href="{{ item.url }}">{{ item.title }}</a></li>
-        {% endfor %}
-    </ul>
+            {% for item in items %}
+                <li><a href="{{ item.url }}">{{ item.title }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}

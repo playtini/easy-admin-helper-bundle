@@ -6,9 +6,11 @@
 {% endblock %}
 
 {% block main %}
-    {% for diagram in diagrams %}
-        <h4 style="margin-top: 20px">{{ diagram.basename|replace({'.svg': ''})|ucfirst }}</h4>
-        {#<img src="{{ url('admin_doc_diagram', {filename: diagram.filename})}}" alt="{{ diagram.basename }}">#}
-        <object data="{{ url('admin_doc_diagram', {filename: diagram.filename})}}"></object>
-    {% endfor %}
+    <div class="doc doc-db">
+        {% for diagram in diagrams %}
+            <h4 style="margin-top: 20px">{{ diagram.basename|replace({'.svg': ''})|ucfirst }}</h4>
+            {#<img src="{{ url('admin_doc_diagram', {filename: diagram.filename})}}" alt="{{ diagram.basename }}">#}
+            <object data="{{ url('admin_doc_diagram', {filename: diagram.filename})}}"></object>
+        {% endfor %}
+    </div>
 {% endblock %}
