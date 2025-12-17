@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Playtini\EasyAdminHelperBundle\Controller\Doc;
 
 use Playtini\EasyAdminHelperBundle\Dashboard\EasyAdminContext;
-use Spatie\YamlFrontMatter\Document;
-use Spatie\YamlFrontMatter\YamlFrontMatter;
+use Playtini\EasyAdminHelperBundle\Frontmatter\FrontmatterParser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +16,7 @@ class DocItemController extends AbstractController
 {
     public function __construct(
         private readonly EasyAdminContext $easyAdminContext,
+        private readonly FrontmatterParser $frontmatterParser,
         #[Autowire('%kernel.project_dir%/doc')]
         private readonly string $docDir,
     ) {
@@ -29,14 +29,13 @@ class DocItemController extends AbstractController
         $data = [];
         $content = 'Not found';
 
-        $filename = $this->docDir.'/'.$name.'.md';
+        $filename = $this->docDir . '/' . $name . '.md';
         if (is_file($filename)) {
-            $object = $this->parseFile($filename);
-            /** @noinspection PhpParenthesesCanBeOmittedForNewCallInspection */
-            $content = (new \Parsedown())->text($object->body());
-            $data = $object->matter();
+            $result = $this->frontmatterParser->parseFileToHtml($filename);
+            $content = $result->html;
+            $data = $result->matter;
         }
-        $data['title'] ??= ucwords(str_replace('_', ' ', $name));
+        $data['title'] ??= $this->frontmatterParser->titleFromFilename($name);
 
         /** @noinspection PhpTemplateMissingInspection */
         return $this->render('@EasyAdminHelper/admin/doc/item.html.twig', [
@@ -44,10 +43,5 @@ class DocItemController extends AbstractController
             'data' => $data,
             'content' => $content,
         ]);
-    }
-
-    public function parseFile(string $filename): Document
-    {
-        return YamlFrontMatter::markdownCompatibleParse((string) file_get_contents($filename));
     }
 }

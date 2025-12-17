@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Playtini\EasyAdminHelperBundle\Controller\Doc;
 
 use Playtini\EasyAdminHelperBundle\Dashboard\EasyAdminContext;
-use Spatie\YamlFrontMatter\Document;
-use Spatie\YamlFrontMatter\YamlFrontMatter;
+use Playtini\EasyAdminHelperBundle\Frontmatter\FrontmatterParser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Finder\Finder;
@@ -18,6 +17,7 @@ class DocController extends AbstractController
 {
     public function __construct(
         private readonly EasyAdminContext $easyAdminContext,
+        private readonly FrontmatterParser $frontmatterParser,
         #[Autowire('%kernel.project_dir%/doc')]
         private readonly string $docDir,
     ) {
@@ -32,11 +32,12 @@ class DocController extends AbstractController
                 continue;
             }
 
-            $object = $this->parseFile($file->getPathname());
+            $name = $file->getBasename('.'.$file->getExtension());
+            $document = $this->frontmatterParser->parseFile($file->getPathname());
             $item = [
-                'url' => $this->generateUrl('admin_doc_item', ['name' => $file->getBasename('.'.$file->getExtension())]),
-                'title' => $object->matter('title') ?? $this->titleFromFilename($file->getBasename('.'.$file->getExtension())),
-                'data' => $object->matter(),
+                'url' => $this->generateUrl('admin_doc_item', ['name' => $name]),
+                'title' => $document->matter('title') ?? $this->frontmatterParser->titleFromFilename($name),
+                'data' => $document->matter(),
             ];
 
             $items[] = $item;
@@ -47,15 +48,5 @@ class DocController extends AbstractController
             'ea' => $this->easyAdminContext->getContextProvider(),
             'items' => $items,
         ]);
-    }
-
-    public function parseFile(string $filename): Document
-    {
-        return YamlFrontMatter::markdownCompatibleParse((string) file_get_contents($filename));
-    }
-
-    private function titleFromFilename(string $filename): string
-    {
-        return ucwords(str_replace('_', ' ', basename($filename)));
     }
 }
