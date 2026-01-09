@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Symfony bundle (`playtini/easy-admin-helper-bundle`) that extends EasyAdmin with helper traits, fields, and controllers for building admin panels. It requires PHP 8.4 and Symfony 7.2.
+This is a Symfony bundle (`playtini/easy-admin-helper-bundle`) that extends EasyAdmin with helper traits, fields, and controllers for building admin panels. It requires PHP 8.4 and Symfony 7.4+.
 
 ## Commands
 
@@ -15,7 +15,7 @@ This is a Symfony bundle (`playtini/easy-admin-helper-bundle`) that extends Easy
 # Run a specific test
 ./vendor/bin/phpunit tests/Formatter/AdminFormatterTest.php
 
-# Static analysis
+# Static analysis (uses phpstan.dist.neon)
 ./vendor/bin/phpstan
 
 # Install dependencies
@@ -32,6 +32,8 @@ Composable traits for CRUD controllers:
 - `ReadOnlyCrudControllerTrait` - Disables edit/delete actions
 - `InlineEditCrudControllerTrait` - Inline editing support
 - `SaveCrudControllerTrait` - Custom save logic
+- `UserCrudControllerTrait` - User-related CRUD helpers
+- `DashboardTrait` / `DashboardCustomConstructorTrait` - Dashboard controller helpers
 
 ### Entity Traits (src/Entity/Traits/)
 Doctrine entity traits for common fields:
@@ -42,14 +44,17 @@ Doctrine entity traits for common fields:
 - `IsEnabledTrait` - Boolean enabled flag
 - `UidEntityTrait` - UID field
 - `CommentEntityTrait` / `ShortCommentEntityTrait` - Comment fields
+- `VirtualFieldsEntityTrait` - For computed/virtual fields
 
 ### CrudField Helper (src/Field/CrudField.php)
-Factory class for creating pre-configured EasyAdmin fields with consistent styling:
-- `CrudField::id()`, `::name()`, `::text()`, `::textarea()`
-- `CrudField::createdAt()`, `::updatedAt()`, `::archivedAtDate()`
-- `CrudField::association()`, `::choices()`, `::yaml()`
-- `CrudField::virtual()`, `::virtualInt()` - For computed display fields
-- `CrudField::isEnabled()`, `::comment()`, `::uid()`
+Factory class for creating pre-configured EasyAdmin fields with consistent styling. Uses static `$disabled` flag for read-only mode. Key methods:
+- Layout: `::panel()` - Fieldset panels with Bootstrap column support
+- Text: `::text()`, `::textarea()`, `::name()`, `::comment()`
+- Numbers: `::id()`, `::int()`
+- Dates: `::createdAt()`, `::updatedAt()`, `::archivedAtDate()`, `::dateMinutes()`
+- Relations: `::association()` (with autocomplete), `::choices()`
+- Special: `::yaml()`, `::uid()`, `::isEnabled()`, `::isLive()`
+- Virtual: `::virtual()`, `::virtualInt()`, `::virtualRight()` - For computed display-only fields
 
 ### Dashboard
 - `CustomDashboardController` - Base dashboard extending EasyAdmin's AbstractDashboardController
@@ -58,8 +63,10 @@ Factory class for creating pre-configured EasyAdmin fields with consistent styli
 
 ### Doc Controllers (src/Controller/Doc/)
 Built-in documentation viewer for markdown files in `{project}/doc/`:
-- Routes at `/admin/doc` and `/admin/doc/{name}`
-- Supports YAML front matter in markdown files
+- `DocController` - Lists all docs at `/admin/doc`
+- `DocItemController` - Shows single doc at `/admin/doc/{name}`
+- `DocDbController` / `DocDiagramController` - Database and diagram documentation
+- Supports YAML front matter in markdown files via `FrontmatterParser`
 
 ### AdminFormatter (src/Formatter/)
 Utility for formatting values in admin views: `formatBoolNull()`, `formatUrlPath()`, `formatHttpStatus()`, `percents()`, `formatExpireDate()`

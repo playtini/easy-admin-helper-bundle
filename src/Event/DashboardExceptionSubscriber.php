@@ -128,6 +128,6 @@ readonly class DashboardExceptionSubscriber implements EventSubscriberInterface
             exit;
         }
 
-        $event->setResponse(new RedirectResponse($url));
+        $event->setResponse(new RedirectResponse($url->generateUrl()));
     }
 }
