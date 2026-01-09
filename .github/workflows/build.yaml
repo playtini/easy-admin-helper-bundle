@@ -12,11 +12,11 @@ jobs:
         runs-on: self-hosted
         steps:
             -   name: checkout
-                uses: actions/checkout@v4
+                uses: actions/checkout@v6
                 with: { fetch-depth: 1 }
 
             -   name: composer cache
-                uses: actions/cache@v4
+                uses: actions/cache@v5
                 with:
                     path: /tmp/composer-cache
                     key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
@@ -45,7 +45,7 @@ jobs:
                     configuration: phpunit.xml.dist
                     coverage_text: true
                     memory_limit: '512M'
-                    php_extensions: xdebug mbstring redis pdo_mysql bcmath
+                    php_extensions: pcov mbstring redis pdo_mysql bcmath
                 env:
                     XDEBUG_MODE: coverage
 
@@ -57,7 +57,7 @@ jobs:
                     memory_limit: '512M'
                     args: '--ignore-platform-reqs --no-ansi --no-scripts --no-progress -o'
 
-            -   uses: actions/upload-artifact@v4
+            -   uses: actions/upload-artifact@v6
                 if: ${{ failure() }}
                 with: { name: 'logs', path: 'var/log' }
 
