@@ -7,3 +7,5 @@ parameters:
         - src/
         - tests/
     treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        - identifier: trait.unused
