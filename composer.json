@@ -7,14 +7,14 @@
     "prefer-stable": true,
     "require": {
         "php": "^8.4",
-        "easycorp/easyadmin-bundle": "^4.27",
-        "erusev/parsedown": "^1.7",
+        "easycorp/easyadmin-bundle": "^4.29",
+        "erusev/parsedown": "^1.8",
         "gupalo/browser-notifier": "^1.4",
         "gupalo/dateutils": "^1.20",
-        "gupalo/monolog-dbal-logger": "^1.9",
+        "gupalo/monolog-dbal-logger": "^1.11",
         "gupalo/symfony-form-transformers": "^1.4",
         "gupalo/uidgenerator": "^1.2",
-        "peekabooauth/peekaboo-bundle": "^1.5",
+        "peekabooauth/peekaboo-bundle": "^1.8",
         "spatie/yaml-front-matter": "^2.1",
         "symfony/framework-bundle": "^7.4|^8.0"
     },
