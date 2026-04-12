@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Symfony bundle (`playtini/easy-admin-helper-bundle`) that extends EasyAdmin with helper traits, fields, and controllers for building admin panels. It requires PHP 8.4 and Symfony 7.4+.
+This is a Symfony bundle (`playtini/easy-admin-helper-bundle`) that extends EasyAdmin with helper traits, fields, and controllers for building admin panels. It requires PHP 8.4 and Symfony 7.4+/8.0+. Root namespace: `Playtini\EasyAdminHelperBundle`.
 
 ## Commands
 
@@ -15,7 +15,7 @@ This is a Symfony bundle (`playtini/easy-admin-helper-bundle`) that extends Easy
 # Run a specific test
 ./vendor/bin/phpunit tests/Formatter/AdminFormatterTest.php
 
-# Static analysis (uses phpstan.dist.neon)
+# Static analysis (level 5, uses phpstan.dist.neon + baseline)
 ./vendor/bin/phpstan
 
 # Install dependencies
@@ -24,10 +24,14 @@ composer install
 
 ## Architecture
 
+### Key Design Pattern: Trait + Interface Pairing
+
+Many features follow a trait+interface pattern. Entity traits (e.g., `ArchivableEntityTrait`) implement corresponding interfaces (e.g., `ArchivableInterface`). Controller traits check for these interfaces at runtime (e.g., `ArchiveCrudControllerTrait` checks `$item instanceof ArchivableInterface`). When adding new features, follow this convention.
+
 ### Controller Traits (src/Controller/Traits/)
 Composable traits for CRUD controllers:
 - `CrudControllerTrait` - Base trait with standard CRUD configuration (date formats, pagination, actions)
-- `ArchiveCrudControllerTrait` - Soft-delete via archiving (filters out archived by default)
+- `ArchiveCrudControllerTrait` - Soft-delete via archiving (filters out archived by default, uses `SaveCrudControllerTrait` internally)
 - `DuplicateCrudControllerTrait` - Entity duplication functionality
 - `ReadOnlyCrudControllerTrait` - Disables edit/delete actions
 - `InlineEditCrudControllerTrait` - Inline editing support
@@ -36,12 +40,12 @@ Composable traits for CRUD controllers:
 - `DashboardTrait` / `DashboardCustomConstructorTrait` - Dashboard controller helpers
 
 ### Entity Traits (src/Entity/Traits/)
-Doctrine entity traits for common fields:
-- `IdEntityTrait` - Auto-increment ID
-- `NameEntityTrait` / `NameUniqueEntityTrait` - Name field
-- `ArchivableEntityTrait` - Soft-delete with `archivedAt` timestamp
+Doctrine entity traits for common fields. Paired interfaces live in `src/Entity/Interfaces/`:
+- `IdEntityTrait` / `IdEntityInterface` - Auto-increment ID
+- `NameEntityTrait` / `NameEntityInterface` - Name field (also `NameUniqueEntityTrait`)
+- `ArchivableEntityTrait` / `ArchivableInterface` - Soft-delete with `archivedAt` timestamp
 - `CreatableEntityTrait` - `createdAt` timestamp
-- `IsEnabledTrait` - Boolean enabled flag
+- `IsEnabledTrait` / `IsEnabledEntityInterface` - Boolean enabled flag
 - `UidEntityTrait` - UID field
 - `CommentEntityTrait` / `ShortCommentEntityTrait` - Comment fields
 - `VirtualFieldsEntityTrait` - For computed/virtual fields
