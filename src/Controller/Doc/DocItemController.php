@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/admin/doc/{name}', name: 'admin_doc_item')]
+#[Route('/admin/doc/{name}', name: 'admin_doc_item', requirements: ['name' => '.+'], priority: -1)]
 class DocItemController extends AbstractController
 {
     public function __construct(

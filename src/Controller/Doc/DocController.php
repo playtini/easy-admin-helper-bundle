@@ -25,28 +25,31 @@ class DocController extends AbstractController
 
     public function __invoke(): Response
     {
-        $items = [];
+        $groups = [];
         $files = Finder::create()->in($this->docDir)->files()->name('*.md')->sortByName();
         foreach ($files as $file) {
             if (!is_file($file->getPathname())) {
                 continue;
             }
 
-            $name = $file->getBasename('.'.$file->getExtension());
+            $relativePath = $file->getRelativePath();
+            $name = $relativePath ? $relativePath.'/'.$file->getBasename('.'.$file->getExtension()) : $file->getBasename('.'.$file->getExtension());
             $document = $this->frontmatterParser->parseFile($file->getPathname());
             $item = [
                 'url' => $this->generateUrl('admin_doc_item', ['name' => $name]),
-                'title' => $document->matter('title') ?? $this->frontmatterParser->titleFromFilename($name),
+                'title' => $document->matter('title') ?? $this->frontmatterParser->titleFromFilename($file->getBasename('.'.$file->getExtension())),
                 'data' => $document->matter(),
             ];
 
-            $items[] = $item;
+            $group = $relativePath ?: '/';
+            $groups[$group][] = $item;
         }
+        ksort($groups);
 
         /** @noinspection PhpTemplateMissingInspection */
         return $this->render('@EasyAdminHelper/admin/doc/index.html.twig', [
             'ea' => $this->easyAdminContext->getContextProvider(),
-            'items' => $items,
+            'groups' => $groups,
         ]);
     }
 }

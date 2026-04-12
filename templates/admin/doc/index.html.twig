@@ -1,4 +1,4 @@
-{% extends '@EasyAdminHelper/layout.html.twig' %}
+{% extends '@EasyAdmin/page/content.html.twig' %}
 
 {% block content_title %}Doc{% endblock %}
 {% block page_actions %}
@@ -6,13 +6,16 @@
 {% endblock %}
 
 {% block main %}
-    <div class="doc doc-index">
-        <ul>
-            <li><a href="{{ url('admin_doc_db') }}">DB</a></li>
+    <ul>
+        <li><a href="{{ url('admin_doc_db') }}">DB</a></li>
+    </ul>
 
+    {% for group, items in groups %}
+        <h3>{{ group == '/' ? 'General' : group }}</h3>
+        <ul>
             {% for item in items %}
                 <li><a href="{{ item.url }}">{{ item.title }}</a></li>
             {% endfor %}
         </ul>
-    </div>
+    {% endfor %}
 {% endblock %}

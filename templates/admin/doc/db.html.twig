@@ -1,4 +1,4 @@
-{% extends '@EasyAdminHelper/layout.html.twig' %}
+{% extends '@EasyAdmin/page/content.html.twig' %}
 
 {% block content_title %}<a href="{{ url('admin_doc') }}">Doc</a> › DB{% endblock %}
 {% block page_actions %}
@@ -6,11 +6,9 @@
 {% endblock %}
 
 {% block main %}
-    <div class="doc doc-db">
-        {% for diagram in diagrams %}
-            <h4 style="margin-top: 20px">{{ diagram.basename|replace({'.svg': ''})|ucfirst }}</h4>
-            {#<img src="{{ url('admin_doc_diagram', {filename: diagram.filename})}}" alt="{{ diagram.basename }}">#}
-            <object data="{{ url('admin_doc_diagram', {filename: diagram.filename})}}"></object>
-        {% endfor %}
-    </div>
+    {% for diagram in diagrams %}
+        <h4 style="margin-top: 20px">{{ diagram.basename|replace({'.svg': ''})|ucfirst }}</h4>
+        {#<img src="{{ url('admin_doc_diagram', {filename: diagram.filename})}}" alt="{{ diagram.basename }}">#}
+        <object data="{{ url('admin_doc_diagram', {filename: diagram.filename})}}"></object>
+    {% endfor %}
 {% endblock %}
