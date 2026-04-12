@@ -57,12 +57,12 @@ jobs:
                     memory_limit: '512M'
                     args: '--ignore-platform-reqs --no-ansi --no-scripts --no-progress -o'
 
-            -   uses: actions/upload-artifact@v6
+            -   uses: actions/upload-artifact@v7
                 if: ${{ failure() }}
                 with: { name: 'logs', path: 'var/log' }
 
             -   name: Slack Message
-                uses: archive/github-actions-slack@v2.9.0
+                uses: archive/github-actions-slack@v2.11.0
                 if: ${{ failure() }}
                 with:
                     slack-function: send-message
@@ -75,7 +75,7 @@ jobs:
         needs: test
         steps:
             -   name: Satis build
-                uses: appleboy/ssh-action@v1.0.3
+                uses: appleboy/ssh-action@v1.2.5
                 with:
                     host: vtools.s.p777.org
                     username: root
@@ -88,7 +88,7 @@ jobs:
 #        needs: build
 #        steps:
 #            -   name: Slack Message
-#                uses: archive/github-actions-slack@v2.9.0
+#                uses: archive/github-actions-slack@v2.11.0
 #                id: notify
 #                with:
 #                    slack-function: send-message
