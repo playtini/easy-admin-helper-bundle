@@ -9,14 +9,17 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CountryField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use Playtini\EasyAdminHelperBundle\Controller\Interfaces\ArchiveCrudControllerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Yaml\Yaml;
@@ -428,6 +431,75 @@ class CrudField
             ->setRequired(false)
             ->setDisabled(self::$disabled)
             ->setTemplatePath('easyadmin/fields/emoji-bool-null.html.twig');
+    }
+
+    public static function bool(string $property, ?string $label = null, int $cols = 2): BooleanField
+    {
+        $label ??= self::humanizeString($property);
+
+        return BooleanField::new($property)
+            ->setLabel($label)
+            ->setColumns($cols)
+            ->setRequired(false)
+            ->setDisabled(self::$disabled)
+            ->setTemplatePath('easyadmin/fields/bool-null.html.twig');
+    }
+
+    public static function ip(int $cols = 12): TextField
+    {
+        return TextField::new('ip')
+            ->setLabel('IP')
+            ->setColumns($cols)
+            ->setRequired(false)
+            ->setDisabled()
+            ->formatValue(static fn(?string $v) => sprintf('<span class="small">%s</span>', htmlspecialchars((string) $v)));
+    }
+
+    public static function email(int $cols = 12): EmailField
+    {
+        return EmailField::new('email')
+            ->setLabel('Email')
+            ->setColumns($cols)
+            ->setRequired(false)
+            ->setDisabled(self::$disabled);
+    }
+
+    public static function domain(int $cols = 12): TextField
+    {
+        return TextField::new('domain')
+            ->setLabel('Domain')
+            ->setColumns($cols)
+            ->setRequired(false)
+            ->setDisabled(self::$disabled);
+    }
+
+    public static function url(string $property = 'url', ?string $label = null, int $cols = 12): UrlField
+    {
+        $label ??= self::humanizeString($property);
+
+        return UrlField::new($property)
+            ->setLabel($label)
+            ->setColumns($cols)
+            ->setRequired(false)
+            ->setDisabled(self::$disabled);
+    }
+
+    public static function country(int $cols = 12): CountryField
+    {
+        return CountryField::new('country')
+            ->setLabel('Country')
+            ->setColumns($cols)
+            ->setRequired(false)
+            ->setDisabled(self::$disabled);
+    }
+
+    public static function status(int $cols = 12): TextField
+    {
+        return TextField::new('status')
+            ->setLabel('Status')
+            ->setColumns($cols)
+            ->setRequired(false)
+            ->setDisabled();
     }
 
     public static function isEnabledEditable(int $cols = 2): BooleanField

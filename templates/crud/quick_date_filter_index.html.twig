@@ -1,0 +1,27 @@
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block global_actions %}
+    <div class="global-actions">
+        {% set period = app.request.query.get('period', '24h') %}
+
+        {% set date_labels = {
+            '1h': 'Last hour',
+            'today': 'Today',
+            '24h': '24h',
+            '7d': '7 days',
+            '30d': '30 days',
+        } %}
+
+        <div class="btn-group">
+            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Date{% if period != 'all' %}: {{ date_labels[period]|default(period) }}{% endif %}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item{{ period == 'all' ? ' active' }}" href="{{ ea_url().set('period', 'all').set('page', 1) }}">All</a></li>
+                {% for key, label in date_labels %}
+                    <li><a class="dropdown-item{{ period == key ? ' active' }}" href="{{ ea_url().set('period', key).set('page', 1) }}">{{ label }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock global_actions %}

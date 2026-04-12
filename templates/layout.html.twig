@@ -5,6 +5,47 @@
 {% block head_stylesheets %}
     {{ parent() }}
 
+    <style>
+        .positive { color: #318e00; font-weight: bold; }
+        .negative { color: #cc504e; font-weight: bold; }
+        .invisible-report { color: rgba(0,0,0,0); font-size: 0; }
+        .uid {
+            font-size: 10px;
+            font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+            display: inline-block;
+            overflow: hidden;
+            max-width: 40px;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+        }
+        .short-1, .short-2, .short-3, .short-4, .short-5, .short-6 {
+            display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .short-1 { max-width: 50px; }
+        .short-2 { max-width: 100px; }
+        .short-3 { max-width: 150px; }
+        .short-4 { max-width: 200px; }
+        .short-5 { max-width: 250px; }
+        .short-6 { max-width: 300px; }
+        .loading { opacity: 0.5; }
+        .btn-action { width: 60px; }
+        tr.top-border { border-top: 2px #ddb solid; }
+        .btn-group-xs > .btn, .btn-xs {
+            padding: 0.15rem 0.25rem; font-size: 0.75rem; line-height: 1.0;
+            border-radius: 0.2rem; margin: 0 5px 2px 5px;
+        }
+        .table .thead-light th {
+            color: #000000; background-color: #cbd3da !important; border-color: #dee2e6;
+        }
+        .text-muted-2 { color: #ccc; }
+        .text-muted-3 { color: #ddd; }
+        .tooltip-inner { text-align: left; white-space: pre; max-width: none; }
+        .break-words { word-break: break-all; }
+
+        [data-bs-theme="dark"] .text-muted-2 { color: #666; }
+        [data-bs-theme="dark"] .text-muted-3 { color: #333; }
+    </style>
+
     <link href="/css/app.css?{{ hour_hash }}" rel="stylesheet">
 
     <script>
@@ -17,6 +58,8 @@
 
                 form.classList.add('row');
             });
+
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
         });
     </script>
 {% endblock %}
@@ -24,7 +67,7 @@
 {% block head_javascript %}
     {{ parent() }}
 
-    <script src="/js/vendor/jquery.js"></script>
+    <script src="{{ asset('bundles/easyadminhelper/js/jquery.js') }}"></script>
     {# <script src="/js/vendor/bootstrap.bundle.min.js"></script> #}
     <script src="/js/app.js?{{ hour_hash }}"></script>
     {{ encore_entry_script_tags('app') }}

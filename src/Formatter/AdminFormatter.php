@@ -95,6 +95,27 @@ class AdminFormatter
         return sprintf('<span class="badge rounded-pill bg-%s">%s</span>', $class, $v);
     }
 
+    public static function badge(string $text, string $bg = '#6c757d', string $fg = '#fff'): string
+    {
+        return sprintf(
+            '<span style="display:inline-block;padding:2px 7px;border-radius:4px;font-size:12px;font-weight:600;background:%s;color:%s">%s</span>',
+            $bg,
+            $fg,
+            htmlspecialchars($text),
+        );
+    }
+
+    /**
+     * @param array<string, array{bg?: string, fg?: string}> $colors Map of value => ['bg' => '#hex', 'fg' => '#hex']
+     */
+    public static function badgeMap(string $value, array $colors, string $defaultBg = '#6c757d'): string
+    {
+        $bg = $colors[$value]['bg'] ?? $defaultBg;
+        $fg = $colors[$value]['fg'] ?? '#fff';
+
+        return self::badge($value, $bg, $fg);
+    }
+
     public static function percents(mixed $value, mixed $total, int $precision = 0): string
     {
         $value = (float)$value;

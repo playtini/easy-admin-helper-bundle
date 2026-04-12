@@ -1,0 +1,113 @@
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block configured_stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="{{ asset('bundles/easyadminhelper/css/vanilla-datetimerange-picker.css') }}" />
+{% endblock %}
+
+{% block configured_javascripts %}
+    <script type="text/javascript" src="{{ asset('bundles/easyadminhelper/js/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/easyadminhelper/js/vanilla-datetimerange-picker.js') }}"></script>
+    {{ parent() }}
+{% endblock %}
+
+{% block page_actions %}
+    <div class="datagrid-date-range me-2">
+        <form method="get" class="auto-submit">
+            {% for key, value in app.request.query.all|filter((v, k) => k not in ['from', 'to']) %}
+                {% if value is iterable %}
+                    {% for subKey, subValue in value %}
+                        {% if subValue is iterable %}
+                            {% for subSubKey, subSubValue in subValue %}
+                                <input type="hidden" name="{{ key }}[{{ subKey }}][{{ subSubKey }}]" value="{{ subSubValue }}">
+                            {% endfor %}
+                        {% else %}
+                            <input type="hidden" name="{{ key }}[{{ subKey }}]" value="{{ subValue }}">
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <input type="hidden" name="{{ key }}" value="{{ value }}">
+                {% endif %}
+            {% endfor %}
+
+            <div class="dateRangeContainer">
+                <div class="dateRange" style="cursor: pointer; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--body-bg); color: var(--text-color);">
+                    <i class="fa fa-calendar"></i>&nbsp;
+                    <span></span> <i class="fa fa-caret-down"></i>
+                </div>
+                <input type="hidden" class="fromDate" name="from" value="{{ from|default('') }}">
+                <input type="hidden" class="toDate" name="to" value="{{ to|default('') }}">
+            </div>
+        </form>
+    </div>
+    {{ parent() }}
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            function formatDate(date) {
+                if (date && typeof date === 'object' && date._isAMomentObject && date._d) {
+                    date = date._d;
+                }
+                if (typeof date === 'number') { date = new Date(date); }
+                if (typeof date === 'string') { return date; }
+                if (date instanceof Date) {
+                    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                }
+                return date;
+            }
+
+            function parseDate(s) { const p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+            function subDays(d, n) { const r = new Date(d); r.setDate(r.getDate() - n); return r; }
+            function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
+            function endOfMonth(d) { return new Date(d.getFullYear(), d.getMonth() + 1, 0); }
+
+            document.querySelectorAll('.dateRange').forEach(function(el) {
+                const container = el.closest('.dateRangeContainer');
+                const minEl = container.querySelector('.fromDate');
+                const maxEl = container.querySelector('.toDate');
+
+                const today = new Date();
+                const start = minEl.value ? parseDate(minEl.value) : subDays(today, 6);
+                const end = maxEl.value ? parseDate(maxEl.value) : today;
+                const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+
+                let initialized = false;
+                function cb(s, e) {
+                    const sf = formatDate(s), ef = formatDate(e);
+                    el.querySelector('span').innerHTML = sf + ' - ' + ef;
+                    minEl.value = sf;
+                    maxEl.value = ef;
+                    if (initialized) {
+                        const form = container.closest('form.auto-submit');
+                        if (form) { form.submit(); }
+                    }
+                }
+                cb(start, end);
+                initialized = true;
+
+                new DateRangePicker(el, {
+                    startDate: start,
+                    endDate: end,
+                    maxDate: today,
+                    minYear: 2024,
+                    alwaysShowCalendars: true,
+                    autoApply: true,
+                    showWeekNumbers: true,
+                    showISOWeekNumbers: true,
+                    locale: { "format": "YYYY-MM-DD", "firstDay": 1 },
+                    ranges: {
+                        '7 days': [subDays(today, 6), today],
+                        '30 days': [subDays(today, 29), today],
+                        '90 days': [subDays(today, 89), today],
+                        '180 days': [subDays(today, 179), today],
+                        'This Month': [startOfMonth(today), endOfMonth(today)],
+                        'Last Month': [startOfMonth(lastMonth), endOfMonth(lastMonth)]
+                    }
+                }, cb);
+            });
+        });
+    </script>
+{% endblock %}
