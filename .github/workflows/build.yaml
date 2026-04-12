@@ -40,7 +40,7 @@ jobs:
             -   name: phpunit
                 uses: php-actions/phpunit@v4
                 with:
-                    version: '11.5'
+                    version: '13'
                     php_version: '8.4'
                     configuration: phpunit.xml.dist
                     coverage_text: true
