@@ -420,7 +420,7 @@ class CrudField
             ->setColumns($cols)
             ->setRequired(false)
             ->setDisabled(self::$disabled)
-            ->setTemplatePath('easyadmin/fields/bool-null.html.twig');
+            ->setTemplatePath('@EasyAdminHelper/easyadmin/fields/bool-null.html.twig');
     }
 
     public static function isLive(int $cols = 2): BooleanField
@@ -430,7 +430,7 @@ class CrudField
             ->setColumns($cols)
             ->setRequired(false)
             ->setDisabled(self::$disabled)
-            ->setTemplatePath('easyadmin/fields/emoji-bool-null.html.twig');
+            ->setTemplatePath('@EasyAdminHelper/easyadmin/fields/emoji-bool-null.html.twig');
     }
 
     public static function bool(string $property, ?string $label = null, int $cols = 2): BooleanField
@@ -442,7 +442,7 @@ class CrudField
             ->setColumns($cols)
             ->setRequired(false)
             ->setDisabled(self::$disabled)
-            ->setTemplatePath('easyadmin/fields/bool-null.html.twig');
+            ->setTemplatePath('@EasyAdminHelper/easyadmin/fields/bool-null.html.twig');
     }
 
     public static function ip(int $cols = 12): TextField
