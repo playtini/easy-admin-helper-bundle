@@ -5,6 +5,102 @@
     {#<a class="btn btn-primary" href="/admin">OK</a>#}
 {% endblock %}
 
+{% block head_stylesheets %}
+    {{ parent() }}
+    <style>
+        .doc-item {
+            max-width: 1012px;
+            margin: 0 auto;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .doc-item h1,
+        .doc-item h2,
+        .doc-item h3,
+        .doc-item h4,
+        .doc-item h5,
+        .doc-item h6 {
+            margin-top: 1.5em;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+        .doc-item h1:first-child,
+        .doc-item h2:first-child,
+        .doc-item h3:first-child {
+            margin-top: 0;
+        }
+        .doc-item h1 { font-size: 2em; padding-bottom: .3em; border-bottom: 1px solid #30363d; }
+        .doc-item h2 { font-size: 1.5em; padding-bottom: .3em; border-bottom: 1px solid #30363d; }
+        .doc-item h3 { font-size: 1.25em; }
+        .doc-item h4 { font-size: 1em; }
+        .doc-item p,
+        .doc-item ul,
+        .doc-item ol {
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+        .doc-item li + li {
+            margin-top: .25em;
+        }
+        .doc-item table {
+            display: block;
+            width: max-content;
+            max-width: 100%;
+            overflow: auto;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+        }
+        .doc-item table th,
+        .doc-item table td {
+            padding: 6px 13px;
+            border: 1px solid #30363d;
+        }
+        .doc-item table th {
+            font-weight: 600;
+            background-color: rgba(255, 255, 255, .04);
+        }
+        .doc-item table tr:nth-child(2n) td {
+            background-color: rgba(255, 255, 255, .02);
+        }
+        .doc-item code {
+            padding: .2em .4em;
+            background-color: rgba(110, 118, 129, .4);
+            border-radius: 6px;
+            font-size: 85%;
+            font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+            color: inherit;
+        }
+        .doc-item pre {
+            padding: 16px;
+            background-color: rgba(110, 118, 129, .15);
+            border-radius: 6px;
+            overflow: auto;
+            margin-bottom: 16px;
+        }
+        .doc-item pre code {
+            padding: 0;
+            background: transparent;
+            font-size: 100%;
+            border-radius: 0;
+        }
+        .doc-item blockquote {
+            padding: 0 1em;
+            border-left: 4px solid #30363d;
+            color: #8b949e;
+            margin: 0 0 16px;
+        }
+        .doc-item hr {
+            height: .25em;
+            background-color: #30363d;
+            border: 0;
+            margin: 24px 0;
+        }
+    </style>
+{% endblock %}
+
 {% block main %}
-    {{ content|raw }}
+    <div class="doc doc-item">
+        {{ content|raw }}
+    </div>
 {% endblock %}
