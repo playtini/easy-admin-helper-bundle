@@ -12,7 +12,7 @@ trait CommentEntityTrait
 
     public function getComment(): string
     {
-        return $this->comment ?? '';
+        return $this->comment;
     }
 
     public function setComment(?string $comment): static

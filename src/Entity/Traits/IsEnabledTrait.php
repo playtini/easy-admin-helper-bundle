@@ -12,7 +12,7 @@ trait IsEnabledTrait
 
     public function isEnabled(): bool
     {
-        $result = $this->isEnabled ?? true;
+        $result = $this->isEnabled;
         if ($result && $this instanceof ArchivableInterface) {
             $result = !$this->isArchived();
         }

@@ -14,7 +14,7 @@ trait UidEntityTrait
 
     public function getUid(): string
     {
-        return $this->uid ?? '';
+        return $this->uid;
     }
 
     public function setUid(?string $uid): static
