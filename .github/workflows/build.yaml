@@ -77,7 +77,7 @@ jobs:
             -   name: Satis build
                 uses: appleboy/ssh-action@v1.2.5
                 with:
-                    host: vtools.s.p777.org
+                    host: tools.s.p777.org
                     username: root
                     key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
                     port: 22
