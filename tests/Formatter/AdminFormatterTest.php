@@ -103,4 +103,16 @@ class AdminFormatterTest extends TestCase
         $this->assertEquals('50%', AdminFormatter::percents(50, 100));
         $this->assertEquals('33.3%', AdminFormatter::percents(1, 3, 1));
     }
+
+    public function testTruncate(): void
+    {
+        $this->assertEquals('', AdminFormatter::truncate(null));
+        $this->assertEquals('', AdminFormatter::truncate(''));
+        $this->assertEquals('short', AdminFormatter::truncate('short'));
+        $this->assertEquals('exactly ten', AdminFormatter::truncate('exactly ten', 11));
+        $this->assertEquals('exactly...', AdminFormatter::truncate('exactly eleven!', 10));
+        $this->assertEquals('hello-', AdminFormatter::truncate('hello-world', 6, ''));
+        $this->assertEquals('héllo...', AdminFormatter::truncate('héllo wörld', 8));
+        $this->assertEquals('ab[...]', AdminFormatter::truncate('abcdefghij', 7, '[...]'));
+    }
 }

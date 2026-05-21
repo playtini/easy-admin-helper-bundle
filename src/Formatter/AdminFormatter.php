@@ -131,4 +131,15 @@ class AdminFormatter
         return round(100 * $value / $total, $precision) . '%';
     }
 
+    public static function truncate(?string $s, int $maxLength = 50, string $suffix = '...'): string
+    {
+        $s = (string)$s;
+
+        if (mb_strlen($s) <= $maxLength) {
+            return $s;
+        }
+
+        return mb_substr($s, 0, max(0, $maxLength - mb_strlen($suffix))) . $suffix;
+    }
+
 }
