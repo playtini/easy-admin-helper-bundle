@@ -115,4 +115,57 @@ class AdminFormatterTest extends TestCase
         $this->assertEquals('héllo...', AdminFormatter::truncate('héllo wörld', 8));
         $this->assertEquals('ab[...]', AdminFormatter::truncate('abcdefghij', 7, '[...]'));
     }
+
+    public function testBadgeDefaults(): void
+    {
+        $result = AdminFormatter::badge('OK');
+
+        $this->assertStringContainsString('background:#6c757d', $result);
+        $this->assertStringContainsString('color:#fff', $result);
+        $this->assertStringContainsString('>OK<', $result);
+    }
+
+    public function testBadgeEscapesHtml(): void
+    {
+        $result = AdminFormatter::badge('<b>x</b>');
+
+        $this->assertStringContainsString('&lt;b&gt;x&lt;/b&gt;', $result);
+        $this->assertStringNotContainsString('<b>x</b>', $result);
+    }
+
+    public function testBadgeCustomColors(): void
+    {
+        $result = AdminFormatter::badge('ON', '#00ff00', '#000');
+
+        $this->assertStringContainsString('background:#00ff00', $result);
+        $this->assertStringContainsString('color:#000', $result);
+    }
+
+    public function testBadgeMapKnownValue(): void
+    {
+        $result = AdminFormatter::badgeMap('active', [
+            'active' => ['bg' => '#0f0', 'fg' => '#000'],
+            'inactive' => ['bg' => '#f00', 'fg' => '#fff'],
+        ]);
+
+        $this->assertStringContainsString('background:#0f0', $result);
+        $this->assertStringContainsString('color:#000', $result);
+        $this->assertStringContainsString('>active<', $result);
+    }
+
+    public function testBadgeMapUnknownValueUsesDefaultBg(): void
+    {
+        $result = AdminFormatter::badgeMap('mystery', ['active' => ['bg' => '#0f0']], defaultBg: '#abc');
+
+        $this->assertStringContainsString('background:#abc', $result);
+        $this->assertStringContainsString('color:#fff', $result); // fg default
+    }
+
+    public function testBadgeMapPartialColorEntryFallsBackToFgDefault(): void
+    {
+        $result = AdminFormatter::badgeMap('warn', ['warn' => ['bg' => '#ff0']]);
+
+        $this->assertStringContainsString('background:#ff0', $result);
+        $this->assertStringContainsString('color:#fff', $result);
+    }
 }
