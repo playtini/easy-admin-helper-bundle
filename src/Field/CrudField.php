@@ -182,7 +182,7 @@ class CrudField
     public static function createdAtDate(int $cols = 12): DateField
     {
         return DateField::new('createdAt')
-            ->setFormat('YYYY-MM-dd HH:mm')
+            ->setFormat('YYYY-MM-dd')
             ->setLabel('Created')
             ->setColumns($cols)
             ->setDisabled()
@@ -201,11 +201,29 @@ class CrudField
             ->hideWhenCreating();
     }
 
+    public static function createdAtMinute(int $cols = 12): DateTimeField
+    {
+        return self::createdAt($cols)
+            ->setFormat('YYYY-MM-dd HH:mm')
+            ->setLabel('Created');
+    }
+
     public static function sentAt(int $cols = 12): DateTimeField
     {
         return DateTimeField::new('sentAt')
             ->setFormat('YYYY-MM-dd HH:mm:ss')
             ->setLabel('Sent')
+            ->setColumns($cols)
+            ->setDisabled()
+            ->setRequired(false)
+            ->hideWhenCreating();
+    }
+
+    public static function updatedAtDate(int $cols = 12): DateField
+    {
+        return DateField::new('updatedAt')
+            ->setFormat('YYYY-MM-dd')
+            ->setLabel('Updated')
             ->setColumns($cols)
             ->setDisabled()
             ->setRequired(false)
@@ -221,6 +239,13 @@ class CrudField
             ->setDisabled()
             ->setRequired(false)
             ->hideWhenCreating();
+    }
+
+    public static function updatedAtMinute(int $cols = 12): DateTimeField
+    {
+        return self::updatedAt($cols)
+            ->setFormat('YYYY-MM-dd HH:mm')
+            ->setLabel('Created');
     }
 
     public static function finishedAt(int $cols = 12): DateTimeField
