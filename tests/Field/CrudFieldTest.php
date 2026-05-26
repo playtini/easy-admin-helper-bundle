@@ -330,7 +330,7 @@ class CrudFieldTest extends TestCase
 
             public static function getEntityFqcn(): string
             {
-                return '';
+                return \stdClass::class;
             }
 
             public function archive(\EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext $context): \Symfony\Component\HttpFoundation\RedirectResponse
