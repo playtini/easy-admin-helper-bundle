@@ -38,6 +38,7 @@ trait DashboardCustomConstructorTrait
             ->setPaginatorPageSize(100)
             ->showEntityActionsInlined()
             ->setDefaultSort(['id' => 'DESC'])
+            ->setDefaultRowAction(null)
             ;
     }
 
