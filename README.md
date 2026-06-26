@@ -30,6 +30,14 @@ easy_admin_helper:
     resource: '@EasyAdminHelperBundle/config/routes.yaml'
 ```
 
+EasyAdmin 5 requires pretty URLs, so the EasyAdmin route loader must be enabled for the custom CRUD actions (archive, duplicate) to be registered. Add to the same `config/routes/easyadmin.yaml`:
+
+```yaml
+easyadmin:
+    resource: .
+    type: easyadmin.routes
+```
+
 Install bundle assets (symlinks JS/CSS to `public/bundles/easyadminhelper/`):
 
     php bin/console assets:install

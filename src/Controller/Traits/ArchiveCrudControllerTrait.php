@@ -3,6 +3,7 @@
 namespace Playtini\EasyAdminHelperBundle\Controller\Traits;
 
 use Doctrine\ORM\QueryBuilder;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -27,6 +28,7 @@ trait ArchiveCrudControllerTrait
 
     protected bool $isShownArchive = false;
 
+    #[AdminRoute('/{entityId}/archive')]
     public function archive(AdminContext $context): RedirectResponse
     {
         $item = $context->getEntity()->getInstance();
@@ -45,8 +47,8 @@ trait ArchiveCrudControllerTrait
         }
 
         return $this->redirect(
-            $this->adminUrlGenerator->get('referrer') ?:
-                $this->adminUrlGenerator->setController(__CLASS__)->setAction(Action::INDEX)->removeReferrer()->generateUrl()
+            $context->getRequest()->headers->get('referer') ?:
+                $this->adminUrlGenerator->setController(__CLASS__)->setAction(Action::INDEX)->generateUrl()
         );
     }
 

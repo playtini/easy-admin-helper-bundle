@@ -2,6 +2,7 @@
 
 namespace Playtini\EasyAdminHelperBundle\Controller\Traits;
 
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -21,6 +22,7 @@ trait DuplicateCrudControllerTrait
 {
     use SaveCrudControllerTrait;
 
+    #[AdminRoute('/{entityId}/duplicate')]
     public function duplicate(AdminContext $context): RedirectResponse
     {
         $item = $context->getEntity()->getInstance();
@@ -40,8 +42,8 @@ trait DuplicateCrudControllerTrait
         }
 
         return $this->redirect(
-            $this->adminUrlGenerator->get('referrer') ?:
-                $this->adminUrlGenerator->setController(__CLASS__)->setAction(Action::INDEX)->removeReferrer()->generateUrl()
+            $context->getRequest()->headers->get('referer') ?:
+                $this->adminUrlGenerator->setController(__CLASS__)->setAction(Action::INDEX)->generateUrl()
         );
     }
 
