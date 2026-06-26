@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Playtini\EasyAdminHelperBundle\Field;
 
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CodeEditorType;

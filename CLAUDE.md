@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Symfony bundle (`playtini/easy-admin-helper-bundle`) that extends EasyAdmin with helper traits, fields, and controllers for building admin panels. It requires PHP 8.4 and Symfony 7.4+/8.0+. Root namespace: `Playtini\EasyAdminHelperBundle`.
+This is a Symfony bundle (`playtini/easy-admin-helper-bundle`) that extends EasyAdmin with helper traits, fields, and controllers for building admin panels. It requires PHP 8.5 and Symfony 7.4+/8.1+. Root namespace: `Playtini\EasyAdminHelperBundle`.
 
 ## Commands
 

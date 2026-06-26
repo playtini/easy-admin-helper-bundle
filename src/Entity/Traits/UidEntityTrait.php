@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Playtini\EasyAdminHelperBundle\Entity\Traits;
 
 use Doctrine\ORM\Mapping as ORM;

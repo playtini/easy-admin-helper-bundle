@@ -26,6 +26,14 @@ class DocController extends AbstractController
     public function __invoke(): Response
     {
         $groups = [];
+        if (!is_dir($this->docDir)) {
+            /** @noinspection PhpTemplateMissingInspection */
+            return $this->render('@EasyAdminHelper/admin/doc/index.html.twig', [
+                'ea' => $this->easyAdminContext->getContextProvider(),
+                'groups' => $groups,
+            ]);
+        }
+
         $files = Finder::create()->in($this->docDir)->files()->name('*.md')->sortByName();
         foreach ($files as $file) {
             if (!is_file($file->getPathname())) {

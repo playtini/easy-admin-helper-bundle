@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Playtini\EasyAdminHelperBundle\Event;
 
 use EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -17,8 +21,9 @@ readonly class DashboardExceptionSubscriber implements EventSubscriberInterface
         private AdminContextProvider $adminContextProvider,
         private AdminUrlGenerator $adminUrlGenerator,
         private RequestStack $requestStack,
-    )
-    {
+        #[Autowire('%kernel.debug%')]
+        private bool $debug = false,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -26,81 +31,87 @@ readonly class DashboardExceptionSubscriber implements EventSubscriberInterface
         return [KernelEvents::EXCEPTION => ['onKernelException']];
     }
 
-    public function sendFlashPrimary($title = '', $message = ''): void
+    public function sendFlashPrimary(string $title = '', string $message = ''): void
     {
         $this->sendFlash('primary', $title, $message);
     }
 
-    public function sendFlashSecondary($title = '', $message = ''): void
+    public function sendFlashSecondary(string $title = '', string $message = ''): void
     {
         $this->sendFlash('secondary', $title, $message);
     }
 
-    public function sendFlashDark($title = '', $message = ''): void
+    public function sendFlashDark(string $title = '', string $message = ''): void
     {
         $this->sendFlash('dark', $title, $message);
     }
 
-    public function sendFlashLight($title = '', $message = ''): void
+    public function sendFlashLight(string $title = '', string $message = ''): void
     {
         $this->sendFlash('light', $title, $message);
     }
 
-    public function sendFlashSuccess($title = '', $message = ''): void
+    public function sendFlashSuccess(string $title = '', string $message = ''): void
     {
         $this->sendFlash('success', $title, $message);
     }
 
-    public function sendFlashInfo($title = '', $message = ''): void
+    public function sendFlashInfo(string $title = '', string $message = ''): void
     {
         $this->sendFlash('info', $title, $message);
     }
 
-    public function sendFlashNotice($title = '', $message = ''): void
+    public function sendFlashNotice(string $title = '', string $message = ''): void
     {
         $this->sendFlash('notice', $title, $message);
     }
 
-    public function sendFlashWarning($title = '', $message = ''): void
+    public function sendFlashWarning(string $title = '', string $message = ''): void
     {
         $this->sendFlash('warning', $title, $message);
     }
 
-    public function sendFlashDanger($title = '', $message = ''): void
+    public function sendFlashDanger(string|ExceptionEvent $title = '', string $message = ''): void
     {
         $this->sendFlash('danger', $title, $message);
     }
 
-    public function sendFlash($type, $title = '', $message = ''): void
+    public function sendFlash(string $type, string|ExceptionEvent $title = '', string $message = ''): void
     {
         if ($title instanceof ExceptionEvent) {
+            $exception = $title->getThrowable();
 
-            $event = $title;
-            $exception = $event->getThrowable();
-
-            $title = get_class($exception) . '<br/>';
+            $title = $exception::class . '<br/>';
             $title .= '(' . $exception->getFile() . ':' . $exception->getLine() . ')';
 
             $message = $exception->getMessage();
         }
 
-        if (!empty($title)) $title = '<b>' . $title . '</b><br/>';
-        if (!empty($title . $message) && $this->requestStack->getSession() instanceof FlashBagAwareSessionInterface) {
-            $this->requestStack->getSession()->getFlashBag()->add($type, $title . $message);
+        if ($title !== '') {
+            $title = '<b>' . $title . '</b><br/>';
+        }
+
+        $session = $this->requestStack->getSession();
+        if (($title . $message) !== '' && $session instanceof FlashBagAwareSessionInterface) {
+            $session->getFlashBag()->add($type, $title . $message);
         }
     }
 
     public function onKernelException(ExceptionEvent $event): void
     {
         // Check if exception happened in EasyAdmin (avoid warning outside EA)
-        if (!$this->adminContextProvider->getContext()) return;
+        if (!$this->adminContextProvider->getContext()) {
+            return;
+        }
 
         // Get back exception & send flash message
         $this->sendFlashDanger($event);
 
         // Get back crud information
         $crud = $this->adminContextProvider->getContext()->getCrud();
-        if (!$crud) return;
+        if (!$crud) {
+            return;
+        }
 
         $controller = $crud->getControllerFqcn();
         $action = $crud->getCurrentPage();
@@ -110,22 +121,24 @@ readonly class DashboardExceptionSubscriber implements EventSubscriberInterface
         // - If exception happened in another section, redirect to index page first
         // - If exception happened after submitting a form, just redirect to the initial page
         $url = $this->adminUrlGenerator->unsetAll();
-        switch ($action) {
-            case 'index':
-                break;
-            default:
-                $url = $url->setController($controller);
-                if ($this->requestStack->getCurrentRequest()->request->count()) {
-                    $url = $url->setAction($action);
-                    $url = $url->set('exception', '1');
-                }
+        if ($action !== 'index') {
+            $url = $url->setController($controller);
+            if ($event->getRequest()->request->count()) {
+                $url = $url->setAction((string)$action);
+                $url = $url->set('exception', '1');
+            }
         }
 
-        if ($event->getRequest()->query->get('exception') === '1') { // avoid infinite redirection loop
-            $e = $event->getThrowable();
-            echo '<h1>' . htmlspecialchars($e->getMessage()) . '</h1>';
-            echo '<pre>' . nl2br(htmlspecialchars($e->getTraceAsString())) . '</pre>';
-            exit;
+        // Avoid infinite redirection loop: render the error instead of redirecting again
+        if ($event->getRequest()->query->get('exception') === '1') {
+            $exception = $event->getThrowable();
+            $html = '<h1>' . htmlspecialchars($exception->getMessage()) . '</h1>';
+            if ($this->debug) {
+                $html .= '<pre>' . nl2br(htmlspecialchars($exception->getTraceAsString())) . '</pre>';
+            }
+            $event->setResponse(new Response($html, Response::HTTP_INTERNAL_SERVER_ERROR));
+
+            return;
         }
 
         $event->setResponse(new RedirectResponse($url->generateUrl()));

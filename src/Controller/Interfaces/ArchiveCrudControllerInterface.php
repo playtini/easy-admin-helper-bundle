@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Playtini\EasyAdminHelperBundle\Controller\Interfaces;
 
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;

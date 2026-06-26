@@ -1,7 +1,7 @@
 EasyAdmin Helper Bundle
 =======================
 
-Extends EasyAdmin with reusable traits, fields, and controllers for building admin panels. Requires PHP 8.4+ and Symfony 7.4+/8.0+.
+Extends EasyAdmin with reusable traits, fields, and controllers for building admin panels. Requires PHP 8.5+ and Symfony 7.4+/8.1+.
 
 Install
 -------
