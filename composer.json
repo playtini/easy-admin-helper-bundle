@@ -41,5 +41,13 @@
         "psr-4": {
             "Playtini\\EasyAdminHelperBundle\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "phpstan": "phpstan",
+        "coverage-check": [
+            "@php vendor/bin/phpunit --coverage-clover=var/coverage/clover.xml --coverage-filter=src",
+            "@php bin/coverage-check.php var/coverage/clover.xml 50"
+        ]
     }
 }

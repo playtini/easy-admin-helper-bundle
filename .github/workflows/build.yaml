@@ -46,8 +46,12 @@ jobs:
                     coverage_text: true
                     memory_limit: '512M'
                     php_extensions: pcov mbstring redis pdo_mysql bcmath
+                    args: --coverage-clover var/coverage/clover.xml --coverage-filter src
                 env:
                     XDEBUG_MODE: coverage
+
+            -   name: coverage gate
+                run: php bin/coverage-check.php var/coverage/clover.xml 50
 
             -   name: composer
                 uses: php-actions/composer@v6
