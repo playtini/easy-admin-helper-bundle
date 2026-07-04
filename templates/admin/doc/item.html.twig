@@ -96,6 +96,11 @@
             border: 0;
             margin: 24px 0;
         }
+        .doc-item pre.mermaid {
+            background: transparent;
+            padding: 0;
+            text-align: center;
+        }
     </style>
 {% endblock %}
 
@@ -103,4 +108,29 @@
     <div class="doc doc-item">
         {{ content|raw }}
     </div>
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    {# mermaid 11.16.0 — vendored in public/js/, installed via assets:install #}
+    <script src="{{ asset('bundles/easyadminhelper/js/mermaid.min.js') }}"></script>
+    <script>
+        (function () {
+            if (typeof mermaid === 'undefined') {
+                return; // script blocked/failed — leave raw code visible as fallback
+            }
+            mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'strict' });
+            document.querySelectorAll('.doc-item code.language-mermaid').forEach(function (code) {
+                var pre = code.closest('pre');
+                if (!pre) {
+                    return;
+                }
+                var target = document.createElement('pre');
+                target.className = 'mermaid';
+                target.textContent = code.textContent;
+                pre.replaceWith(target);
+            });
+            mermaid.run();
+        })();
+    </script>
 {% endblock %}
