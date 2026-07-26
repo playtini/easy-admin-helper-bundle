@@ -27,4 +27,15 @@ trait CreatableEntityTrait
 
         return $this;
     }
+
+    /**
+     * Requires #[ORM\HasLifecycleCallbacks] on the consuming entity class.
+     */
+    #[ORM\PrePersist]
+    public function initializeCreatedAt(): void
+    {
+        if ($this->createdAt === null) {
+            $this->createdAt = Dat::now();
+        }
+    }
 }
