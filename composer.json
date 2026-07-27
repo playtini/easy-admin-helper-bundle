@@ -37,7 +37,7 @@
             "Playtini\\EasyAdminHelperBundle\\": "src/"
         }
     },
-    "autoload_dev": {
+    "autoload-dev": {
         "psr-4": {
             "Playtini\\EasyAdminHelperBundle\\Tests\\": "tests/"
         }
