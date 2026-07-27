@@ -10,6 +10,7 @@ services:
         public: true
 
     Playtini\EasyAdminHelperBundle\EventListener\ReleaseSessionEarlyListener:
+        autowire: true
         autoconfigure: true
 
     Playtini\EasyAdminHelperBundle\Controller\:
