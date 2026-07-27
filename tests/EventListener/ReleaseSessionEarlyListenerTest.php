@@ -33,6 +33,15 @@ class ReleaseSessionEarlyListenerTest extends TestCase
         new ReleaseSessionEarlyListener()($event);
     }
 
+    public function testSavesStartedSessionForArrayControllerInheritingTheClassAttribute(): void
+    {
+        $session = $this->startedSessionExpectingSave(1);
+        $controller = [new AttributedController(), 'someAction'];
+        $event = $this->event($controller, $session, HttpKernelInterface::MAIN_REQUEST);
+
+        new ReleaseSessionEarlyListener()($event);
+    }
+
     public function testIgnoresUnattributedMethodOnAnUnattributedClass(): void
     {
         $session = $this->startedSessionExpectingSave(0);
