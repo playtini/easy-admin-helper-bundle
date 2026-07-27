@@ -6,3 +6,4 @@
 .DS_Store
 /var/
 /coverage/
+/.worktrees/
