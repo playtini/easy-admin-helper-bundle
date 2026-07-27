@@ -54,6 +54,16 @@ Doctrine entity traits for common fields. Paired interfaces live in `src/Entity/
 - `CommentEntityTrait` / `ShortCommentEntityTrait` - Comment fields
 - `VirtualFieldsEntityTrait` - For computed/virtual fields
 
+### Entity Base Classes (src/Entity/)
+- `BaseAuditLog` - `#[ORM\MappedSuperclass]` carrying the eight columns of a per-request audit log (`username`, `routeName`, `routeParams`, `url`, `httpMethod`, `statusCode`, `ip`, `responseTimeMs`) plus id/createdAt via `CreatableEntityTrait`. Projects subclass it with their own `#[ORM\Entity]`, indexes and repository. The concrete class must declare `#[ORM\HasLifecycleCallbacks]`. Do not also `use IdEntityTrait` — `CreatableEntityTrait` already composes it. Requires `doctrine.orm.auto_mapping: true` (or an explicit mapping for this namespace) in the consuming app, or the subclass silently maps to zero columns.
+
+### Session Handling (src/Attribute/, src/EventListener/)
+- `ReleaseSessionEarly` - Marker attribute for a controller class or method.
+- `ReleaseSessionEarlyListener` - Flushes the session before an attributed action runs, so the session row is not held for the duration. Inert when the attribute is unused.
+
+### Forms (src/Form/)
+- `BulkImportType` / `Form\Dto\BulkImport` - Paste-a-TSV import form with five create/update modes. The form knows nothing about the target entity; the controller reads `BulkImport::getRows()` and decides what each row means.
+
 ### CrudField Helper (src/Field/CrudField.php)
 Factory class for creating pre-configured EasyAdmin fields with consistent styling. Uses static `$disabled` flag for read-only mode. Key methods:
 - Layout: `::panel()` - Fieldset panels with Bootstrap column support

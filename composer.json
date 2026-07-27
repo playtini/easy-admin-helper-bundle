@@ -14,6 +14,7 @@
         "gupalo/monolog-dbal-logger": "^1.11",
         "gupalo/symfony-form-transformers": "^1.4",
         "gupalo/uidgenerator": "^1.2",
+        "luchaninov/csv-file-loader": "^1.10",
         "peekabooauth/peekaboo-bundle": "^1.8",
         "spatie/yaml-front-matter": "^2.1",
         "symfony/framework-bundle": "^7.4|^8.1"
@@ -37,7 +38,7 @@
             "Playtini\\EasyAdminHelperBundle\\": "src/"
         }
     },
-    "autoload_dev": {
+    "autoload-dev": {
         "psr-4": {
             "Playtini\\EasyAdminHelperBundle\\Tests\\": "tests/"
         }
