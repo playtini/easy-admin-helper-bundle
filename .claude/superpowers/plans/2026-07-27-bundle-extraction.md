@@ -1386,12 +1386,20 @@ class AuditLog extends BaseAuditLog
 ```bash
 docker compose -p seo_cms -f ./docker/compose.yaml exec app \
   /app/bin/console doctrine:schema:update --dump-sql > /tmp/seo-cms-schema-after.txt 2>&1
-diff /tmp/seo-cms-schema-before.txt /tmp/seo-cms-schema-after.txt && echo "SCHEMA UNCHANGED"
+
+# Doctrine does not guarantee stable statement ordering, so compare as sets.
+diff <(sort /tmp/seo-cms-schema-before.txt) <(sort /tmp/seo-cms-schema-after.txt) \
+  && echo "SET-IDENTICAL"
+echo "audit_log refs — before: $(grep -ic audit_log /tmp/seo-cms-schema-before.txt), after: $(grep -ic audit_log /tmp/seo-cms-schema-after.txt)"
 ```
 
-Expected: `SCHEMA UNCHANGED`.
+Expected: `SET-IDENTICAL`, and **0 references to `audit_log` in both dumps**.
 
-**If the diff is non-empty, stop and report it. Do not write a migration.**
+Both conditions must hold. The reference count is the load-bearing one: it is what proves this change contributes no DDL for the adopted table. Set-equality catches anything else the change might have perturbed.
+
+A dump that is non-empty overall is not by itself a failure — these projects carry pre-existing drift on unrelated tables (`_log`, the messenger tables), which this task neither causes nor is responsible for fixing. kobzar's dumps contained 10 such statements before and after.
+
+**If the sets differ, or if either dump references `audit_log`, stop and report it. Do not write a migration, and do not adjust the entity to make the difference go away.** Either means the bundle's base does not match what the fork actually has, and the fix belongs in the bundle.
 
 - [ ] **Step 6: Commit the entity change on its own**
 
