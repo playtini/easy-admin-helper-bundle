@@ -75,6 +75,21 @@ Features
 | `DataEntityTrait`                                | `data` (JSON column with YAML display helper) |
 | `VirtualFieldsEntityTrait`                       | Stub methods for computed fields              |
 
+### Entity Base Classes
+
+`BaseAuditLog` is a `#[ORM\MappedSuperclass]` carrying the eight columns of a per-request audit log (`username`, `routeName`, `routeParams`, `url`, `httpMethod`, `statusCode`, `ip`, `responseTimeMs`) plus `id`/`createdAt` via `CreatableEntityTrait`. Subclass it with your own `#[ORM\Entity]`, indexes and repository:
+
+```php
+#[ORM\Entity(repositoryClass: AuditLogRepository::class)]
+#[ORM\HasLifecycleCallbacks]
+#[ORM\Index(columns: ['created_at'])]
+class AuditLog extends BaseAuditLog {}
+```
+
+`#[ORM\HasLifecycleCallbacks]` must be declared on the concrete class or `createdAt` never gets set. Do not also `use IdEntityTrait` — `CreatableEntityTrait` already composes it.
+
+**Requires `doctrine.orm.auto_mapping: true`** in the consuming application, or an explicit Doctrine mapping for the `Playtini\EasyAdminHelperBundle\Entity` namespace. Without one, Doctrine treats `BaseAuditLog` as transient and the subclass maps to zero columns — `doctrine:schema:update` will then propose dropping every column from the existing table rather than failing loudly.
+
 ### CrudField Helper
 
 Static factory for pre-configured EasyAdmin fields:
@@ -150,6 +165,24 @@ class EventCrudController extends AbstractCrudController
 ```
 
 The trait handles `createIndexQueryBuilder()` and `configureResponseParameters()` automatically. Override `getDateRangeField()` and `getDateRangeDefaultDays()` to customize.
+
+### Release Session Early
+
+`#[ReleaseSessionEarly]` marks a controller class or method as session-read-only. `ReleaseSessionEarlyListener` then flushes the session (`$session->save()`) before the action runs, so the session row isn't held for the duration — useful for concurrent XHRs from the same user.
+
+```php
+#[ReleaseSessionEarly]
+public function export(): Response
+{
+    // session already flushed by the time this runs
+}
+```
+
+Sessions are never started by the listener: if the controller hasn't started one, nothing happens. It's inert in a project that doesn't use the attribute. Attribute lookup is not inheritance-aware — declare it on the concrete controller class or method, not on an abstract base controller.
+
+### Bulk Import
+
+`BulkImportType` is a paste-a-TSV import form backed by `Form\Dto\BulkImport`. It knows nothing about the target entity: the controller reads `BulkImport::getRows()` and decides what each row means. `BulkImport::getMode()` returns one of five modes (`MODE_CREATE_OR_UPDATE`, `MODE_CREATE_ONLY`, `MODE_UPDATE_ONLY`, `MODE_CREATE_SKIP_EXISTING`, `MODE_UPDATE_SKIP_MISSING`) so every project offers the same choices with the same stored values.
 
 ### Doc Controllers
 

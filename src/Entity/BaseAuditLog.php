@@ -23,6 +23,12 @@ use Playtini\EasyAdminHelperBundle\Entity\Traits\CreatableEntityTrait;
  * #[ORM\HasLifecycleCallbacks] must be declared on the concrete class or
  * CreatableEntityTrait::initializeCreatedAt() never fires.
  *
+ * Requires `doctrine.orm.auto_mapping: true` in the consuming application, or an
+ * explicit mapping for the `Playtini\EasyAdminHelperBundle\Entity` namespace.
+ * Without one, Doctrine treats this class as transient and the subclass maps to
+ * zero columns — schema:update will then propose dropping every column from the
+ * existing table rather than failing.
+ *
  * CreatableEntityTrait already composes IdEntityTrait, so $id and getId() come
  * from it. Do not also `use IdEntityTrait` in a subclass — the two collide.
  */
@@ -59,6 +65,7 @@ abstract class BaseAuditLog
     /**
      * Final so that `new static()` below is safe for every subclass. Doctrine
      * hydrates through newInstanceWithoutConstructor() and never calls it.
+     * A consequence of being final: no subclass may declare its own constructor.
      */
     final public function __construct()
     {

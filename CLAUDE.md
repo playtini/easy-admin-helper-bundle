@@ -55,7 +55,7 @@ Doctrine entity traits for common fields. Paired interfaces live in `src/Entity/
 - `VirtualFieldsEntityTrait` - For computed/virtual fields
 
 ### Entity Base Classes (src/Entity/)
-- `BaseAuditLog` - `#[ORM\MappedSuperclass]` carrying the eight columns of a per-request audit log (`username`, `routeName`, `routeParams`, `url`, `httpMethod`, `statusCode`, `ip`, `responseTimeMs`) plus id/createdAt via `CreatableEntityTrait`. Projects subclass it with their own `#[ORM\Entity]`, indexes and repository. The concrete class must declare `#[ORM\HasLifecycleCallbacks]`. Do not also `use IdEntityTrait` — `CreatableEntityTrait` already composes it.
+- `BaseAuditLog` - `#[ORM\MappedSuperclass]` carrying the eight columns of a per-request audit log (`username`, `routeName`, `routeParams`, `url`, `httpMethod`, `statusCode`, `ip`, `responseTimeMs`) plus id/createdAt via `CreatableEntityTrait`. Projects subclass it with their own `#[ORM\Entity]`, indexes and repository. The concrete class must declare `#[ORM\HasLifecycleCallbacks]`. Do not also `use IdEntityTrait` — `CreatableEntityTrait` already composes it. Requires `doctrine.orm.auto_mapping: true` (or an explicit mapping for this namespace) in the consuming app, or the subclass silently maps to zero columns.
 
 ### Session Handling (src/Attribute/, src/EventListener/)
 - `ReleaseSessionEarly` - Marker attribute for a controller class or method.

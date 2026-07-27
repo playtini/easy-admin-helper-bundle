@@ -19,6 +19,10 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  * Sessions are never started here: if the controller hasn't started one, no
  * save happens. The listener is inert in a project that uses the attribute
  * nowhere.
+ *
+ * Attribute lookup is not inheritance-aware: {@see ReleaseSessionEarly} must be
+ * declared on the concrete controller class or method, not on an abstract base
+ * controller — ReflectionClass::getAttributes() does not walk up the hierarchy.
  */
 #[AsEventListener(event: ControllerEvent::class)]
 final readonly class ReleaseSessionEarlyListener
