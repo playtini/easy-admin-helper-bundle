@@ -1143,7 +1143,7 @@ git push origin 1.34
 The satis index on `tools.s.p777.org` rebuilds every 15 minutes via cron. Confirm 1.34 is installable before starting Task 5:
 
 ```bash
-curl -s https://satis.p777.org/p2/playtini/easy-admin-helper-bundle.json | grep -o '"version":"1\.34"'
+curl -s https://satis.p777.org/p2/playtini/easy-admin-helper-bundle.json | grep -o '"version": "1\.34"'
 ```
 
 Expected: `"version":"1.34"`. If it is absent, wait for the next quarter-hour and retry. Do not start Task 5 until it appears — `composer update` in the forks will silently resolve to 1.33 instead.
