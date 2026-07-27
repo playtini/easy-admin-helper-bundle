@@ -178,7 +178,7 @@ public function export(): Response
 }
 ```
 
-Sessions are never started by the listener: if the controller hasn't started one, nothing happens. It's inert in a project that doesn't use the attribute. Attribute lookup is not inheritance-aware — declare it on the concrete controller class or method, not on an abstract base controller.
+Sessions are never started by the listener: if the controller hasn't started one, nothing happens. It's inert in a project that doesn't use the attribute. Attribute lookup is not inheritance-aware — declare it on the concrete controller class or method, not on an abstract base controller. For invokable controllers, the attribute is honoured whether it's placed on the class or on `__invoke()`.
 
 ### Bulk Import
 

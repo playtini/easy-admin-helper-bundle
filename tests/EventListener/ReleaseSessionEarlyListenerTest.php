@@ -7,6 +7,7 @@ namespace Playtini\EasyAdminHelperBundle\Tests\EventListener;
 use PHPUnit\Framework\TestCase;
 use Playtini\EasyAdminHelperBundle\EventListener\ReleaseSessionEarlyListener;
 use Playtini\EasyAdminHelperBundle\Tests\EventListener\Fixture\AttributedController;
+use Playtini\EasyAdminHelperBundle\Tests\EventListener\Fixture\InvokableMethodAttributedController;
 use Playtini\EasyAdminHelperBundle\Tests\EventListener\Fixture\MethodAttributedController;
 use Playtini\EasyAdminHelperBundle\Tests\EventListener\Fixture\PlainController;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,6 +39,14 @@ class ReleaseSessionEarlyListenerTest extends TestCase
         $session = $this->startedSessionExpectingSave(1);
         $controller = [new AttributedController(), 'someAction'];
         $event = $this->event($controller, $session, HttpKernelInterface::MAIN_REQUEST);
+
+        new ReleaseSessionEarlyListener()($event);
+    }
+
+    public function testSavesStartedSessionForInvokableControllerWithAttributeOnInvokeMethod(): void
+    {
+        $session = $this->startedSessionExpectingSave(1);
+        $event = $this->event(new InvokableMethodAttributedController(), $session, HttpKernelInterface::MAIN_REQUEST);
 
         new ReleaseSessionEarlyListener()($event);
     }

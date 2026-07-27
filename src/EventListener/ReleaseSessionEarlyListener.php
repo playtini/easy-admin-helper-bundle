@@ -23,6 +23,11 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  * Attribute lookup is not inheritance-aware: {@see ReleaseSessionEarly} must be
  * declared on the concrete controller class or method, not on an abstract base
  * controller — ReflectionClass::getAttributes() does not walk up the hierarchy.
+ *
+ * For an invokable controller, Symfony's ControllerResolver hands this listener
+ * a bare object rather than a `[$object, '__invoke']` array, so the attribute is
+ * looked for on either the class or the `__invoke()` method — whichever one it
+ * was placed on.
  */
 #[AsEventListener(event: ControllerEvent::class)]
 final readonly class ReleaseSessionEarlyListener
@@ -61,6 +66,13 @@ final readonly class ReleaseSessionEarlyListener
         }
 
         if (is_object($controller)) {
+            if (method_exists($controller, '__invoke')) {
+                $reflectionMethod = new ReflectionMethod($controller, '__invoke');
+                if ($reflectionMethod->getAttributes(ReleaseSessionEarly::class) !== []) {
+                    return true;
+                }
+            }
+
             return (new ReflectionClass($controller))->getAttributes(ReleaseSessionEarly::class) !== [];
         }
 
