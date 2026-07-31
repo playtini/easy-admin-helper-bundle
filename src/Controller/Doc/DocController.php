@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Playtini\EasyAdminHelperBundle\Controller\Doc;
 
 use Playtini\EasyAdminHelperBundle\Dashboard\EasyAdminContext;
+use Playtini\EasyAdminHelperBundle\Doc\DocPathResolver;
 use Playtini\EasyAdminHelperBundle\Frontmatter\FrontmatterParser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -18,6 +19,7 @@ class DocController extends AbstractController
     public function __construct(
         private readonly EasyAdminContext $easyAdminContext,
         private readonly FrontmatterParser $frontmatterParser,
+        private readonly DocPathResolver $docPathResolver,
         #[Autowire('%kernel.project_dir%/doc')]
         private readonly string $docDir,
     ) {
@@ -42,6 +44,10 @@ class DocController extends AbstractController
 
             $relativePath = $file->getRelativePath();
             $name = $relativePath ? $relativePath.'/'.$file->getBasename('.'.$file->getExtension()) : $file->getBasename('.'.$file->getExtension());
+            if ($this->docPathResolver->resolveFile($this->docDir, $name . '.md') === null) {
+                continue;
+            }
+
             $document = $this->frontmatterParser->parseFile($file->getPathname());
             $item = [
                 'url' => $this->generateUrl('admin_doc_item', ['name' => $name]),

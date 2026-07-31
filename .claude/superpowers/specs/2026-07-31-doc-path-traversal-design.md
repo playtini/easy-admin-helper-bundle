@@ -38,8 +38,12 @@ input as untrusted, via `preg_replace('#(\.\.|/)#', '', $filename)`. That guard
 holds today — with every `/` removed, traversal is inexpressible — but it is a
 lexical strip, it silently rewrites input rather than rejecting it, and it means
 the bundle carries two different guard styles for one input class.
-`DocController` (the listing) is unaffected: `Finder::create()->in($this->docDir)`
-cannot escape its root.
+`DocController` (the listing) cannot itself be used to escape the doc
+directory — `Finder::create()->in($this->docDir)` stays rooted there — but a
+symlinked doc file that the resolver would reject on the item page still
+showed up in the listing, so the index advertised a document that then 404'd.
+Filtering the listing through the same resolver (see Components) closes that
+gap.
 
 ## Approach
 
@@ -129,7 +133,25 @@ Two intentional behavior changes, both improvements:
   throws `FileNotFoundException` (a `RuntimeException`) for a non-existent
   path, which is not converted to a 404 by the kernel.
 
-### 4. `config/services.yaml` (changed)
+### 4. `src/Controller/Doc/DocController.php` (changed)
+
+Inject `DocPathResolver`. Inside the `foreach` over the Finder results, after
+`$name` is computed, skip any file the resolver rejects — resolving
+`$name . '.md'` against `$this->docDir`, the same expression
+`DocItemController` uses, so the index and the item page can never disagree:
+
+```php
+if ($this->docPathResolver->resolveFile($this->docDir, $name . '.md') === null) {
+    continue;
+}
+```
+
+This closes the gap where a symlinked `.md` file (rejected by the resolver
+because its target leaves the doc directory) was still listed on the index,
+whose link then 404'd on the item page. Grouping, sorting and `$item`
+construction are unchanged.
+
+### 5. `config/services.yaml` (changed)
 
 Services in this bundle are registered explicitly; only `src/Controller/` is
 glob-registered. Without an entry, autowiring the resolver into the controllers
