@@ -8,6 +8,8 @@ services:
     Playtini\EasyAdminHelperBundle\Frontmatter\FrontmatterParser:
         autowire: true
         public: true
+    Playtini\EasyAdminHelperBundle\Doc\DocPathResolver:
+        autowire: true
 
     Playtini\EasyAdminHelperBundle\EventListener\ReleaseSessionEarlyListener:
         autowire: true
