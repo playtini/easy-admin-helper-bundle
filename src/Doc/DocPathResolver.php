@@ -35,7 +35,7 @@ final class DocPathResolver
             return null;
         }
 
-        if (!is_file($path)) {
+        if (!is_file($path) || !is_readable($path)) {
             return null;
         }
 

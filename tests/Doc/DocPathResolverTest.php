@@ -19,16 +19,17 @@ class DocPathResolverTest extends TestCase
         $this->resolver = new DocPathResolver();
 
         $root = sys_get_temp_dir() . '/doc_path_resolver_' . uniqid();
-        mkdir($root . '/base/ops', 0777, true);
-        mkdir($root . '/base/db', 0777, true);
-        mkdir($root . '/base/sub', 0777, true);
-        mkdir($root . '/basedocs', 0777, true);
-        mkdir($root . '/outside', 0777, true);
+        self::assertTrue(mkdir($root . '/base/ops', 0777, true));
+        self::assertTrue(mkdir($root . '/base/db', 0777, true));
+        self::assertTrue(mkdir($root . '/base/sub', 0777, true));
+        self::assertTrue(mkdir($root . '/basedocs', 0777, true));
+        self::assertTrue(mkdir($root . '/outside', 0777, true));
         file_put_contents($root . '/base/ops/known-issues.md', '# known issues');
         file_put_contents($root . '/base/db/schema.md', '# schema');
         file_put_contents($root . '/basedocs/leak.md', '# leak');
         file_put_contents($root . '/outside/secret.md', '# secret');
-        symlink($root . '/outside', $root . '/base/escape');
+        self::assertTrue(symlink($root . '/outside', $root . '/base/escape'));
+        self::assertTrue(symlink($root . '/outside/secret.md', $root . '/base/linked.md'));
 
         // realpath() because sys_get_temp_dir() is itself symlinked on macOS
         $this->root = (string)realpath($root);
@@ -90,7 +91,16 @@ class DocPathResolverTest extends TestCase
 
     public function testRejectsSymlinkPointingOutsideBaseDir(): void
     {
+        self::assertTrue(is_link($this->baseDir . '/escape'));
+
         $this->assertNull($this->resolver->resolveFile($this->baseDir, 'escape/secret.md'));
+    }
+
+    public function testRejectsSymlinkedFilePointingOutsideBaseDir(): void
+    {
+        self::assertTrue(is_link($this->baseDir . '/linked.md'));
+
+        $this->assertNull($this->resolver->resolveFile($this->baseDir, 'linked.md'));
     }
 
     public function testRejectsDirectory(): void
@@ -108,15 +118,33 @@ class DocPathResolverTest extends TestCase
         $this->assertNull($this->resolver->resolveFile($this->baseDir, ''));
     }
 
-    public function testRejectsNullByteWithoutError(): void
+    public function testRejectsBareNullByteInRelativePathWithoutError(): void
     {
         $this->assertNull($this->resolver->resolveFile($this->baseDir, "\0"));
+    }
+
+    public function testRejectsNullByteAppendedToValidRelativePathWithoutError(): void
+    {
         $this->assertNull($this->resolver->resolveFile($this->baseDir, "ops/known-issues.md\0"));
+    }
+
+    public function testRejectsNullByteInBaseDirWithoutError(): void
+    {
         $this->assertNull($this->resolver->resolveFile($this->baseDir . "\0", 'ops/known-issues.md'));
     }
 
     public function testRejectsMissingBaseDir(): void
     {
         $this->assertNull($this->resolver->resolveFile($this->root . '/nope', 'ops/known-issues.md'));
+    }
+
+    public function testRejectsAbsolutePathOutsideBaseDir(): void
+    {
+        $this->assertNull($this->resolver->resolveFile($this->baseDir, $this->root . '/outside/secret.md'));
+    }
+
+    public function testRejectsAbsoluteSystemPath(): void
+    {
+        $this->assertNull($this->resolver->resolveFile($this->baseDir, '/etc/hosts'));
     }
 }
