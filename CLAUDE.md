@@ -6,6 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Symfony bundle (`playtini/easy-admin-helper-bundle`) that extends EasyAdmin with helper traits, fields, and controllers for building admin panels. It requires PHP 8.5 and Symfony 7.4+/8.1+. Root namespace: `Playtini\EasyAdminHelperBundle`.
 
+## Workflow
+
+Work directly on `main` in this repository. Do not create feature branches, pull
+requests, or git worktrees — this overrides the global preference for
+worktree-isolated, branch-based plan execution.
+
+Releases are plain incrementing tags on `main` (`1.34`, `1.35`, …); there is no
+`v` prefix and no changelog file.
+
 ## Design specs
 
 Brainstorming/design specs live in `.claude/superpowers/specs/` (named `YYYY-MM-DD-<topic>-design.md`), not the skill's default `docs/superpowers/specs/`.
