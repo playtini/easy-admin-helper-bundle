@@ -25,6 +25,9 @@ class BulkImportType extends AbstractType
         $builder
             ->add('data', TextareaType::class, [
                 'required' => true,
+                // An empty textarea submits as null, and BulkImport::setData() takes a string.
+                // `required` is only an HTML attribute, so a browser that skips it 500'd the page.
+                'empty_data' => '',
                 'attr' => [
                     'rows' => 20,
                     'wrap' => 'off',

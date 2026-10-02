@@ -51,4 +51,22 @@ class BulkImportTypeTest extends TypeTestCase
         $this->assertSame("domain\nexample.test", $item->getData());
         $this->assertSame(BulkImport::MODE_CREATE_ONLY, $item->getMode());
     }
+
+    /**
+     * An empty textarea submits as null, and BulkImport::setData() takes a string: without
+     * empty_data the PropertyAccessor threw InvalidTypeException and the import page 500'd
+     * (seo-cms Sentry 36514, /admin/site/import).
+     */
+    public function testSubmittingAnEmptyTextareaYieldsAnEmptyString(): void
+    {
+        $form = $this->factory->create(BulkImportType::class);
+
+        $form->submit(['data' => '', 'mode' => BulkImport::MODE_CREATE_OR_UPDATE]);
+
+        $this->assertTrue($form->isSynchronized());
+        $item = $form->getData();
+        $this->assertInstanceOf(BulkImport::class, $item);
+        $this->assertSame('', $item->getData());
+        $this->assertSame([], $item->getRows());
+    }
 }
