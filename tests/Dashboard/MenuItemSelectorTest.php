@@ -56,13 +56,23 @@ final class MenuItemSelectorTest extends TestCase
         self::assertSame([false, true], self::selected($items));
     }
 
-    public function testUnknownKeySelectsNothing(): void
+    public function testLinkMatchIsSelectedEvenWithoutACounter(): void
     {
-        $items = [self::item('/admin/doc')];
+        $items = [self::item('/admin'), self::item('/admin/doc')];
 
         MenuItemSelector::select($items, '/admin/doc', null);
 
-        self::assertSame([false], self::selected($items));
+        self::assertSame([false, true], self::selected($items));
+    }
+
+    public function testUnknownKeySelectsNothing(): void
+    {
+        $items = [self::item('/admin'), self::item('/admin/doc')];
+
+        MenuItemSelector::select($items, '/admin/unknown', null);
+        MenuItemSelector::select($items, 'unknown', null);
+
+        self::assertSame([false, false], self::selected($items));
     }
 
     private static function item(string $url): MenuItemDto
