@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use Playtini\EasyAdminHelperBundle\Dashboard\DashboardHelper;
 use Playtini\EasyAdminHelperBundle\Dashboard\EasyAdminMenuInterface;
+use Playtini\EasyAdminHelperBundle\Dashboard\MenuItemSelector;
 
 /**
  * @property EasyAdminMenuInterface $easyAdminMenu
@@ -56,11 +57,14 @@ trait DashboardCustomConstructorTrait
     {
         $key ??= $this->dashboardHelper->requestStack->getCurrentRequest()?->getPathInfo();
 
-        $menuItems = $this->dashboardHelper->adminContextProvider->getContext()?->getMainMenu()->getItems();
-        $index = $this->easyAdminMenu->menuCounters[$key] ?? null;
-
-        if (null !== $index) {
-            $menuItems[$index]->setSelected(true);
+        if (null === $key) {
+            return;
         }
+
+        MenuItemSelector::select(
+            $this->dashboardHelper->adminContextProvider->getContext()?->getMainMenu()->getItems() ?? [],
+            $key,
+            $this->easyAdminMenu->menuCounters[$key] ?? null,
+        );
     }
 }
